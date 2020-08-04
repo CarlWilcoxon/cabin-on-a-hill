@@ -1,8 +1,15 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
+import { withStyles } from '@material-ui/styles';
 import { TextField, InputAdornment} from '@material-ui/core';
 import { connect } from 'react-redux';
 
-class App extends Component {
+const styles = theme => ({
+  root: {
+  }
+})
+
+class Spike extends Component {
 
   state = {
     currentInput: '',
@@ -37,6 +44,8 @@ class App extends Component {
   }
 
   render () {
+  const {classes} = this.props;
+
   return(
     <div className="Home">
       <header className="Home-header">
@@ -53,7 +62,7 @@ class App extends Component {
                 </InputAdornment>
               ),
             }}              variant={'standard'}
-            color={"secondary"}  //Change color to flourescent green
+            color={"#76ff03"}  //Change color to flourescent green
             value={this.state.currentInput}
           />
         </form>
@@ -61,8 +70,13 @@ class App extends Component {
     </div>
   )};
 }
+
 const mapStateToProps = reduxState => ({
   reduxState,
 });
 
-export default connect(mapStateToProps)(App);
+Spike.propTypes = {
+  classes: PropTypes.object.isRequired
+};
+
+export default withStyles(styles)(connect(mapStateToProps)(Spike));
