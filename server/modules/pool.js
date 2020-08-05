@@ -1,8 +1,8 @@
 /* the only line you likely need to change is
 
- database: 'prime_app',
+ database: 'cabin',
 
- change `prime_app` to the name of your database `cabin`, and you should be all set!
+ change `cabin` to the name of your database, and you should be all set!
 */
 
 const pg = require('pg');

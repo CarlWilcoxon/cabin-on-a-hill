@@ -1,9 +1,6 @@
-body, input {
+body {
   font-family: 'Roboto Mono', monospace;
   margin: 0px;
-  background-color: black;
-  color: limegreen;
-  border: none;
 }
 
 .alert {
