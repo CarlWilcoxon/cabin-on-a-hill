@@ -6,7 +6,6 @@ import {
 } from 'react-router-dom';
 import { connect } from 'react-redux';
 import './App.css';
-import LoginPage from '../LoginPage/LoginPage';
 import ProtectedRoute from '../ProtectedRoute/ProtectedRoute';
 import Game from '../Game/Game';
 
