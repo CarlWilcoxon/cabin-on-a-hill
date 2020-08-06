@@ -23,6 +23,11 @@ class RegisterPage extends Component {
     }
   } // end registerUser
 
+  login = (event) => {
+    event.preventDefault();
+    this.props.dispatch({type: 'SET_TO_LOGIN_MODE'});
+  }
+
   handleInputChangeFor = propertyName => (event) => {
     this.setState({
       [propertyName]: event.target.value,
@@ -41,7 +46,7 @@ class RegisterPage extends Component {
           </h2>
         )}
         <form onSubmit={this.registerUser}>
-          <h1>Register User</h1>
+          <h1>Register New User</h1>
           <div>
             <label htmlFor="username">
               Username:
@@ -74,13 +79,13 @@ class RegisterPage extends Component {
           </div>
         </form>
         <center>
-          <button
-            type="button"
-            className="link-button"
-            onClick={() => {this.props.dispatch({type: 'SET_TO_LOGIN_MODE'})}}
-          >
-            Login
-          </button>
+        <form onSubmit={this.login}>
+          <input
+            type="submit"
+            className="login"
+            value="Login"
+          />
+        </form>
         </center>
       </div>
     );
