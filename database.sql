@@ -7,7 +7,7 @@ CREATE TABLE "user" (
   "id" SERIAL PRIMARY KEY,
   "username" VARCHAR (80) UNIQUE NOT NULL,
   "password" VARCHAR (1000) NOT NULL,
-  "current_location_id" INT
+  "current_location_id" INT DEFAULT 1
 );
 
 CREATE TABLE "items_carried" (
