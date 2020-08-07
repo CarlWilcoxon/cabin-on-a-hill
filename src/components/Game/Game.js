@@ -5,7 +5,7 @@ class Game extends Component {
 
   state = {
     currentInput: '',
-    arrayOfWords: ['taco', 'burrito'],
+    arrayOfWords: ['default', 'words'],
   }
 
   changeHandler = (propertyName, event) => {
