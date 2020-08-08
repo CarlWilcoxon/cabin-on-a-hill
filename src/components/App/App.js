@@ -10,10 +10,7 @@ import ProtectedRoute from '../ProtectedRoute/ProtectedRoute';
 import Game from '../Game/Game';
 
 class App extends Component {
-
-
   render () {
-
   return(
     <div className="App">
       <Router>
