@@ -1,27 +1,26 @@
 const express = require('express');
 const pool = require('../modules/pool');
 const router = express.Router();
+const { rejectUnauthenticated } = require('../modules/authentication-middleware');
 
 /**
  * GET route template
- */
-router.get('/', rejectUnauthenticated, (req, res) => {
+//  */
+// router.get('/', rejectUnauthenticated, (req, res) => {
 
-});
+// });
 
 /**
  * POST route template
  */
-router.post('/', rejectUnauthenticated, (req, res) => {
-
-  console.log('req.body', req.body);
+router.post('/', rejectUnauthenticated, async (req, res) => {
 
   // Create one connection to handle transactions
   const connection = await pool.connect();
 
   try {
     // Start transaction
-    await connection.query('BEGIN:');
+    await connection.query('BEGIN');
 
     //Do transaction things
     const checkSynonyms = `SELECT * FROM synonym_list
@@ -30,9 +29,11 @@ router.post('/', rejectUnauthenticated, (req, res) => {
     // Save the result so we can get the returned value
     const result = await connection.query( checkSynonyms );
 
+    console.log(result.rows);
+
     // End transaction with COMMIT
     await connection.query('COMMIT;');
-    res.send(result);
+    res.send(result.rows);
 
   } catch (err) {
     console.log('Error on command', err);

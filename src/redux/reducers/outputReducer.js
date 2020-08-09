@@ -9,6 +9,8 @@ const output = (state = ['You wake up on the floor of your bedroom. Morning ligh
       return ['You are now kneeling'];
     case 'PRONE':
       return ['You are now prone'];
+    case 'OUTPUT':
+      return [action.payload];
 
     default:
       return state;
