@@ -23,26 +23,18 @@ class Game extends Component {
       arrayOfWords,
       currentInput: '',
     })
-    if (this.state.arrayOfWords.length > 1) {
-      this.props.dispatch({
-        type: arrayOfWords[0],
-        payload: arrayOfWords,
-      });
-    } else {
-      this.props.dispatch({
-        type: arrayOfWords[0]
-      })
-    }
+    this.props.dispatch({
+      type: 'COMMAND',
+      payload: arrayOfWords,
+    });
   }
 
   render () {
 
   return(
     <div className="Game">
-      <header className="Game-header">
-      <p>
-          {this.props.reduxState.output.map((word, index) => <span key={index}>{word + ' '}</span>)}
-      </p>
+      <header className="Game-output">
+        {this.props.reduxState.output.map((word, index) => <p key={index}>{word}</p>)}
       </header>
       <form onSubmit={this.submitHandler}>
         {">"}

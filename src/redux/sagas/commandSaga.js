@@ -1,26 +1,35 @@
 import axios from 'axios';
 import { put, takeLatest } from 'redux-saga/effects';
 
-// worker Saga: will be fired on "FETCH_USER" actions
-function* checkCommand() {
+// worker Saga: will be fired on the "COMMAND" action
+function* checkCommand(action) {
   try {
-    // the config includes credentials which
-    // allow the server session to recognize the user
-    // If a user is logged in, this will return their information
-    // from the server session (req.user)
-    const response = yield axios.post('/api/command');
+    let search = '';
+    if (action.payload !== undefined) {
+      for (let i = 0; i < action.payload.length; i++) {
+        search = search + action.payload[i];
+        // if it is not the last word, add a space at the end
+        if (i !== action.payload.length - 1) {
+          search = search + ' ';
+        }
+      }
+    }
 
-    // now that the session has given us a user object
-    // with an id and username set the client-side user object to let
-    // the client-side code know the user is logged in
-    yield put({ type: 'OUTPUT', payload: response.data });
+    if (search === 'LOOK') {
+      yield put({type:'LOOK'})
+    } else{
+      const response = yield axios.post('/api/command/' + search);
+
+      yield put({ type: 'OUTPUT', payload: response.data });
+    }
+
   } catch (error) {
     console.log('User get request failed', error);
   }
 }
 
 function* commandSaga() {
-  yield takeLatest('LOOK', checkCommand);
+  yield takeLatest('COMMAND', checkCommand);
 }
 
 export default commandSaga;

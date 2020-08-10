@@ -2,6 +2,7 @@ const express = require('express');
 const pool = require('../modules/pool');
 const router = express.Router();
 const { rejectUnauthenticated } = require('../modules/authentication-middleware');
+const { useReducer } = require('react');
 
 /**
  * GET route template
@@ -13,7 +14,7 @@ const { rejectUnauthenticated } = require('../modules/authentication-middleware'
 /**
  * POST route template
  */
-router.post('/', rejectUnauthenticated, async (req, res) => {
+router.post('/:search', rejectUnauthenticated, async (req, res) => {
 
   // Create one connection to handle transactions
   const connection = await pool.connect();
@@ -30,6 +31,42 @@ router.post('/', rejectUnauthenticated, async (req, res) => {
     const result = await connection.query( checkSynonyms );
 
     console.log(result.rows);
+    // check each matching entry
+    for (let i = 0; i < result.rows.length; i++) {
+      result.rows[i] = {
+        ...result.rows[i],
+        successful: false, //add a variable to see if a command is used correctly
+      };
+      switch (result.rows[i].server_keyword) {
+
+      //  grab
+        case 'GRAB':
+          //make sure the user is in the correct location
+          if (req.user.current_location_id === result.rows.required_location_id) {
+            //if they are then add the correct item to the items_carried table
+            const grabQuery = `INSERT INTO "items_carried" ("user_id", "item_id")
+                              VALUES ( $1 , $2 );`;
+            const grabValues = [ req.user.id, result.rows.server_target_id ];
+            await connection.query( grabQuery, grabValues );
+          }
+        break;
+
+        //  move
+        case 'MOVE':
+          //make sure the user is in the correct location
+          if (req.user.current_location_id === result.rows.required_location_id) {
+            //if they are then
+            const pathQuery = `SELECT * FROM "path"`
+            const
+          }
+//  die
+      }
+    }
+
+
+
+
+
 
     // End transaction with COMMIT
     await connection.query('COMMIT;');
