@@ -24,11 +24,13 @@ router.post('/:search', rejectUnauthenticated, async (req, res) => {
     await connection.query('BEGIN');
 
     //Do transaction things
-    const checkSynonyms = `SELECT * FROM synonym_list
+    const synQuery = `SELECT * FROM synonym_list
                             JOIN "command" ON "command"."id" = "synonym_list"."command_id"
-                            WHERE synonym_list.synonym = 'LOOK';`
+                            WHERE synonym_list.synonym = $1;`
+    const synValues = [ req.params.search ];
+
     // Save the result so we can get the returned value
-    const result = await connection.query( checkSynonyms );
+    const result = await connection.query( synQuery, synValues );
 
     console.log(result.rows);
     // check each matching entry
@@ -48,25 +50,41 @@ router.post('/:search', rejectUnauthenticated, async (req, res) => {
                               VALUES ( $1 , $2 );`;
             const grabValues = [ req.user.id, result.rows.server_target_id ];
             await connection.query( grabQuery, grabValues );
+            result.rows[i].successful = true;
           }
-        break;
+          break;
 
         //  move
         case 'MOVE':
           //make sure the user is in the correct location
           if (req.user.current_location_id === result.rows.required_location_id) {
-            //if they are then
-            const pathQuery = `SELECT * FROM "path"`
-            const
+            //if they are then look for the path that matches the command_id
+            const pathQuery = `SELECT * FROM "path"
+                              WHERE "command_id" = $1;`
+            const pathValue = [ result.rows.id ];
+            const path = await connection.query( pathQuery , pathValue );
+
+            // move the user along the path
+            const moveQuery = `UPDATE user
+                              SET current_location_id = $1
+                              WHERE id = $2;`
+            const moveValue = [ path.rows[0].to_id , req.user.id ];
+            await connection.query( moveQuery, moveValue);
+
+            // update the client-side location
+            const newRoomQuery = `SELECT * location
+                            WHERE id = $1;`
+            const newRoomValue = [ path.rows[0].to_id ]
+            const newRoom = await connection.query( newRoomQuery, newRoomValue )
+
+                //TODO
+                //SEND THE NEWROOM BACK TO THE CLIENT
+            result.rows[i].successful = true;
+
           }
-//  die
+      //  die TODO
       }
     }
-
-
-
-
-
 
     // End transaction with COMMIT
     await connection.query('COMMIT;');

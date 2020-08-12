@@ -4,23 +4,25 @@ import { put, takeLatest } from 'redux-saga/effects';
 // worker Saga: will be fired on the "COMMAND" action
 function* checkCommand(action) {
   try {
-    let search = '';
-    if (action.payload !== undefined) {
-      for (let i = 0; i < action.payload.length; i++) {
-        search = search + action.payload[i];
-        // if it is not the last word, add a space at the end
-        if (i !== action.payload.length - 1) {
-          search = search + ' ';
+
+    // set search to an empty string if there is nothing in action.payload
+    // or create a string with the words
+    let search = (action.payload !== undefined) ? action.payload.join(' ') : '';
+
+    switch(search) {
+      case 'CLEAR':
+        yield put({type: 'CLEAR'});
+        break;
+      case 'TACO':
+        yield put({ type: 'OUTPUT', payload : 'BURRITO'});
+        break;
+      default:
+        const response = yield axios.post('/api/command/' + search);
+        switch(response.data.dope){
+
+          default:
+            yield put({ type: 'OUTPUT', payload: response.data });
         }
-      }
-    }
-
-    if (search === 'LOOK') {
-      yield put({type:'LOOK'})
-    } else{
-      const response = yield axios.post('/api/command/' + search);
-
-      yield put({ type: 'OUTPUT', payload: response.data });
     }
 
   } catch (error) {

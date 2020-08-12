@@ -24,6 +24,10 @@ class Game extends Component {
       currentInput: '',
     })
     this.props.dispatch({
+      type: 'OUTPUT',
+      payload: arrayOfWords.join(' '),
+    })
+    this.props.dispatch({
       type: 'COMMAND',
       payload: arrayOfWords,
     });

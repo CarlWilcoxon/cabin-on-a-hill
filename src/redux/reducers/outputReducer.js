@@ -9,8 +9,14 @@ const output = (state = ['You wake up on the floor of your bedroom. Morning ligh
       return ['You are now kneeling'];
     case 'PRONE':
       return ['You are now prone'];
+    case 'CLEAR':
+      return [];
     case 'OUTPUT':
-      return [action.payload];
+      console.log('inside OUTPUT', action.payload);
+      if (action.payload.length === 0) {
+        return [...state, "I don't know what you mean by that." ];
+      }
+      return [...state, action.payload];
 
     default:
       return state;
