@@ -13,15 +13,23 @@ function* checkCommand(action) {
       case 'CLEAR':
         yield put({type: 'CLEAR'});
         break;
+      // TODO setup LOOK handler
       case 'TACO':
         yield put({ type: 'OUTPUT', payload : 'BURRITO'});
         break;
       default:
         const response = yield axios.post('/api/command/' + search);
-        switch(response.data.dope){
-
-          default:
-            yield put({ type: 'OUTPUT', payload: response.data });
+        // filter out the failed actions, unless everything failed
+        // if everything failed then only let one response through
+        let allFailed = true;
+        for (let i = 0; i < response.data.length; i++) {
+          if (response.data[i].successful) {
+            allFailed = false;
+            yield put({ type: 'OUTPUT', payload: response.data[i] })
+          }
+        }
+        if (allFailed) {
+          yield put({ type: 'OUTPUT', payload: response.data[0] })
         }
     }
 
