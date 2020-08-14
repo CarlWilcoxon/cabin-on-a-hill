@@ -51,24 +51,30 @@ CREATE TABLE "command" (
   "required_location_id" INT,
   "success_text" VARCHAR (1000),
   "failure_text" VARCHAR (1000),
-  "server_keyword" VARCHAR (30)
+  "server_keyword" VARCHAR (30),
+  "server_target_id" INT
 );
 
-INSERT INTO "command" ("id", "command_name",  "required_item_id", "required_location_id", "success_text", "failure_text", "server_keyword")
-VALUES (1, 'LOOK', null, null, null, 'You don''t know how to see $1', 'LOOK'),
-(2, 'USE BLINDS', null, 1, 'You are swallowed up by darkness.', 'You don''t know how to do that.', 'DIE'),
-(3, 'LIGHT CANDLE', 4, null, 'You light the candle.', 'You don''t know how to do that.', 'MOVE'),
-(4, 'NORTH', null, null, null, 'You walk into the wall.', 'MOVE'),
-(5, 'EAST', null, null, null, 'You walk into the wall.', 'MOVE'),
-(6, 'SOUTH', null, null, null, 'You walk into the wall.', 'MOVE'),
-(7, 'WEST', null, null, null, 'You walk into the wall.', 'MOVE'),
-(8, 'CLEAN', null, 1, 'You clean your room. It looks a lot better in here.', 'What do you want to clean?', 'MOVE'),
-(9, 'GRAB LIGHTER', null, 5, 'You pick up the LIGHTER' , 'You don''t know how to do that.', 'GRAB'),
-(10, 'GRAB LIGHTER', null, 7, 'You pick up the LIGHTER' , 'You don''t know how to do that.', 'GRAB'),
-(11, 'GRAB CANDLE', null, 3, 'You pick up the CANDLE' , 'You don''t know how to do that.', 'GRAB'),
-(12, 'GRAB CANDLE', null, 7, 'You pick up the CANDLE' , 'You don''t know how to do that.', 'GRAB'),
-(13, 'GRAB CANDLE', null, 8, 'You pick up the CANDLE' , 'You don''t know how to do that.', 'GRAB'),
-(14, 'WEST', null, 9, 'You are swallowed up by the darkness.', 'You walk into the wall.', 'DIE');
+select * from "path";
+UPDATE "user"
+SET "current_location_id" = 1
+WHERE "id" = 1;`
+                              
+INSERT INTO "command" ("id", "command_name",  "required_item_id", "required_location_id", "success_text", "failure_text", "server_keyword", "server_target_id")
+VALUES (1, 'LOOK', null, null, null, 'You don''t see that.', 'LOOK', null),
+(2, 'USE BLINDS', null, 1, 'You are swallowed up by darkness.', 'You don''t know how to do that.', 'DIE', null),
+(3, 'LIGHT CANDLE', 5, null, 'You light the candle.', 'You don''t know how to do that.', 'GRAB', 4),
+(4, 'NORTH', null, null, 'You head NORTH.', 'You walk into the wall.', 'MOVE', null),
+(5, 'EAST', null, null, 'You head EAST.', 'You walk into the wall.', 'MOVE', null),
+(6, 'SOUTH', null, null, 'You head SOUTH.', 'You walk into the wall.', 'MOVE', null),
+(7, 'WEST', null, null, 'You head WEST.', 'You walk into the wall.', 'MOVE', null),
+(8, 'CLEAN', null, 1, 'You clean your room. It looks a lot better in here.', 'What do you want to clean?', 'MOVE', null),
+(9, 'GRAB LIGHTER', null, 5, 'You pick up the LIGHTER' , 'You don''t know how to do that.', 'GRAB', 3),
+(10, 'GRAB LIGHTER', null, 7, 'You pick up the LIGHTER' , 'You don''t know how to do that.', 'GRAB', 3),
+(11, 'GRAB CANDLE', null, 3, 'You pick up the CANDLE' , 'You don''t know how to do that.', 'GRAB', 2),
+(12, 'GRAB CANDLE', null, 7, 'You pick up the CANDLE' , 'You don''t know how to do that.', 'GRAB', 2),
+(13, 'GRAB CANDLE', null, 8, 'You pick up the CANDLE' , 'You don''t know how to do that.', 'GRAB', 2),
+(14, 'WEST', null, 9, 'You are swallowed up by the darkness.', 'You walk into the wall.', 'DIE', null);
 
 CREATE TABLE "item" (
   "id" SERIAL PRIMARY KEY,
@@ -78,11 +84,11 @@ CREATE TABLE "item" (
 
 
 INSERT INTO "item" ("id", "item_name", "description" )
-VALUES (1, 'Backpack','It holds stuff for you.'),
-(2, 'Candle', 'It smells like flowers.'),
-(3, 'Lighter', 'Don''t play with it.'),
-(4, 'Lighter & Candle', null),
-(5, 'Lit Candle', 'It gives off a faint glow and pleasant smell.');
+VALUES (1, 'BACKPACK','It holds stuff for you.'),
+(2, 'CANDLE', 'It smells like flowers.'),
+(3, 'LIGHTER', 'Don''t play with it.'),
+(4, 'LIT CANDLE', 'It gives off a faint glow and pleasant smell.'),
+(5, 'Candle & Lighter', 'Meta-item');
 
 CREATE TABLE "location" (
   "id" SERIAL PRIMARY KEY,
@@ -104,7 +110,8 @@ VALUES (1, 'Bedroom', 'Dirty Bedroom', 'What your bedroom looks like.', 1),
 (9, 'Hallway', 'Hallway dark', 'You stand in a dark and spooky hallway, you can''t even see the WEST end. You notice a DOOR next to you to the NORTH, and a DOOR leading EAST to your bedroom.',null),
 (10, 'Hallway', 'Hallway Bright', 'You stand in a long and spooky hallway, your little candle lights the way to the KITCHEN to the WEST. You notice a DOOR next to you to the NORTH, and a DOOR leading EAST to your bedroom.',null),
 (11, 'Bathroom', 'Bathroom Bright', 'There is a dirty TOILET. A medicine CABINET over the sink is open and empty. You are holding a lit candle.', null),
-(12, 'Bedroom', 'Bright Bedroom', 'Your bedroom looks pretty good now, and smells nice with the candle you are holding.', null);
+(12, 'Bedroom', 'Bright Bedroom', 'Your bedroom looks pretty good now, and smells nice with the candle you are holding.', null),
+(13, 'Kitchen', 'Win condition', 'Kitchen', 'You make it to the kitchen.', null);
 
 
 CREATE TABLE "path" (
@@ -112,14 +119,15 @@ CREATE TABLE "path" (
   "path_name" VARCHAR (100),
   "from_id" INT,
   "to_id" INT,
-  "command_word_id" INT
+  "command_id" INT
   );
 
-INSERT INTO "path" ( "id", "path_name", "from_id", "to_id", "command_word_id" )
+INSERT INTO "path" ( "id", "path_name", "from_id", "to_id", "command_id" )
 VALUES (1, 'Clean up room', 1, 2, 8),
 (2, 'West from clean bedroom to dark hallway', 2 , 7 , 7),
 (3, 'East from dark hallway to clean bedroom', 7, 2, 5),
-(4, 'North from dark hallway to default bathroom', 7 , 3 , 4);
+(4, 'North from dark hallway to default bathroom', 7 , 3 , 4),
+(5, '');
 
 ALTER TABLE "location" ADD FOREIGN KEY ("item_found_here_id") REFERENCES "item" ("id");
 

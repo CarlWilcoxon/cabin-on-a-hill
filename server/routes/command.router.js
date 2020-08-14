@@ -25,13 +25,22 @@ router.post('/:search', rejectUnauthenticated, async (req, res) => {
 
     // Figure out if the word is in the synonym list
     const synQuery = `SELECT * FROM synonym_list
-                            JOIN "command" ON "command"."id" = "synonym_list"."command_id"
-                            WHERE synonym_list.synonym = $1;`
+                      JOIN "command" ON "command"."id" = "synonym_list"."command_id"
+                      WHERE synonym_list.synonym = $1;`
     const synValues = [ req.params.search ];
 
     // Save the result so we can get the returned value
     const result = await connection.query( synQuery, synValues );
 
+    // Load the user's inventory
+    const invQuery = `SELECT * FROM "items_carried"
+                      WHERE user_id = $1;`
+    const invValues = [ req.user.id ];
+
+    // Save the result so we can get the returned value
+    const inventory = await connection.query( invQuery, invValues );
+
+    console.log(inventory.rows);
     console.log(result.rows);
     // check each entry from the synonym list that was returned
     for (let i = 0; i < result.rows.length; i++) {
@@ -43,24 +52,16 @@ router.post('/:search', rejectUnauthenticated, async (req, res) => {
 
       //  grab handler
         case 'GRAB':
-          //make sure the user is in the correct location
-          if (req.user.current_location_id === result.rows.required_location_id) {
-            //if they are then add the correct item to the items_carried table
+          // make sure the user is in the correct location or there is no location restriction
+          if ((req.user.current_location_id === result.rows.required_location_id
+            || result.rows.required_location_id === null) || (  TODO )) {
+            // if they are then add the correct item to the items_carried table
             const grabQuery = `INSERT INTO "items_carried" ("user_id", "item_id")
                               VALUES ( $1 , $2 );`
             const grabValues = [ req.user.id, result.rows.server_target_id ];
             await connection.query( grabQuery, grabValues );
-            // Update the variables to indicate what was done and tell the client
-            // how to handle the response.
-            result.rows[i] = {
-              ...result.rows[i],
-            successful : true,
-            }
-          }
 
-        //  move handler
-        case 'MOVE':
-          //make sure the user is in the correct location
+          // make sure the user is in the correct location
           if (req.user.current_location_id === result.rows[i].required_location_id) {
             //if they are then look for the path that matches the command_id
             const pathQuery = `SELECT * FROM "path"
@@ -69,15 +70,15 @@ router.post('/:search', rejectUnauthenticated, async (req, res) => {
             const path = await connection.query( pathQuery , pathValue );
 
             // move the user along the path
-            const moveQuery = `UPDATE "user"
-                              SET "current_location_id" = $1
+            const moveQuery = `UPDATE "user_location"
+                              SET "location_id" = $1
                               WHERE "id" = $2;`
             const moveValue = [ path.rows[0].to_id , req.user.id ];
             await connection.query( moveQuery, moveValue);
 
             // update the client-side location
             const newRoomQuery = `SELECT * FROM "location"
-                            WHERE "id" = $1;`
+                                  WHERE "id" = $1;`
             const newRoomValue = [ path.rows[0].to_id ]
             const newRoom = await connection.query( newRoomQuery, newRoomValue )
 
@@ -88,7 +89,59 @@ router.post('/:search', rejectUnauthenticated, async (req, res) => {
             successful : true,
             }
           }
-          //  die handler TODO
+            // Update the variables to indicate what was done and tell the client
+            // how to handle the response.
+            result.rows[i] = {
+              ...result.rows[i],
+            successful : true,
+            }
+          }
+
+        //  move handler
+        case 'MOVE':
+          // make sure the user is in the correct location
+          if (req.user.current_location_id === result.rows[i].required_location_id) {
+            //if they are then look for the path that matches the command_id
+            const pathQuery = `SELECT * FROM "path"
+                              WHERE "command_word_id" = $1;`
+            const pathValue = [ result.rows[i].id ];
+            const path = await connection.query( pathQuery , pathValue );
+
+            // move the user along the path
+            const moveQuery = `UPDATE "user_location"
+                              SET "location_id" = $1
+                              WHERE "id" = $2;`
+            const moveValue = [ path.rows[0].to_id , req.user.id ];
+            await connection.query( moveQuery, moveValue);
+
+            // update the client-side location
+            const newRoomQuery = `SELECT * FROM "location"
+                                  WHERE "id" = $1;`
+            const newRoomValue = [ path.rows[0].to_id ]
+            const newRoom = await connection.query( newRoomQuery, newRoomValue );
+
+            //SEND THE NEWROOM BACK TO THE CLIENT
+            result.rows[i] = {
+              ...result.rows[i],
+            newRoom : newRoom,
+            successful : true,
+            }
+          }
+
+          //  die handler
+        case 'DIE':
+          // delete items the user acquired
+          const deathQuery = `DELETE FROM "items_carried"
+                              WHERE user_id = $1;`
+
+          await connection.query(deathQuery, [req.user.id] );
+
+          // move the user back to the starting location
+          const moveQuery = `UPDATE "user_location"
+                              SET "location_id" = 1
+                              WHERE "id" = $1;`
+          await connection.query(moveQuery, [req.user.id] );
+
       }
     }
 
@@ -110,6 +163,8 @@ router.post('/:search', rejectUnauthenticated, async (req, res) => {
 
 module.exports = router;
 
+// Example transaction used to make the rest of the router
+// -------------------------------------------------------
 // // Setup route for new account with balance
 // router.post('/', async (req, res) => {
 //   const name = req.body.name;

@@ -13,7 +13,6 @@ function* checkCommand(action) {
       case 'CLEAR':
         yield put({type: 'CLEAR'});
         break;
-      // TODO setup LOOK handler
       case 'TACO':
         yield put({ type: 'OUTPUT', payload : 'BURRITO'});
         break;

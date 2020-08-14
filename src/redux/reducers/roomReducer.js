@@ -1,7 +1,7 @@
 const room = (state = {}, action) => {
   switch (action.type) {
     case 'SET_ROOM':
-      return action.payload;
+      return action.payload[0];
     default:
       return state;
   }
