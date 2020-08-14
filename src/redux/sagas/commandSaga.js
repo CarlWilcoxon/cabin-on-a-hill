@@ -13,6 +13,9 @@ function* checkCommand(action) {
       case 'CLEAR':
         yield put({type: 'CLEAR'});
         break;
+      case 'LOGOUT':
+        yield put({ type: 'LOGOUT' });
+        break;
       case 'TACO':
         yield put({ type: 'OUTPUT', payload : 'BURRITO'});
         break;

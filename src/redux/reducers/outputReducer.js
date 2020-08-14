@@ -6,7 +6,7 @@ const output = (state = ['You wake up on the floor of your bedroom. Morning ligh
     case 'OUTPUT':
       console.log('inside OUTPUT', action.payload);
 
-      if (action.payload.length === 0 || action.payload.length === undefined ) {
+      if (action.payload === undefined) {
         return [...state, "I don't know what you mean by that." ];
 
         // } else if ( typeof(action.payload[0]) === 'object' ) {
