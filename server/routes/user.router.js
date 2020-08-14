@@ -15,14 +15,34 @@ router.get('/', rejectUnauthenticated, (req, res) => {
 // Handles POST request with new user data
 // The only thing different from this and every other post we've seen
 // is that the password gets encrypted before being inserted
-router.post('/register', (req, res, next) => {  
+router.post('/register', async (req, res, next) => {
   const username = req.body.username;
   const password = encryptLib.encryptPassword(req.body.password);
 
-  const queryText = 'INSERT INTO "user" (username, password) VALUES ($1, $2) RETURNING id';
-  pool.query(queryText, [username, password])
-    .then(() => res.sendStatus(201))
-    .catch(() => res.sendStatus(500));
+  const connection = await pool.connect()
+  try {
+    await connection.query('BEGIN');
+
+    // Create a new user and store the returned id
+    const queryText = 'INSERT INTO "user" (username, password) VALUES ($1, $2) RETURNING id';
+    const userId = await pool.query(queryText, [username, password])
+
+    // Use the id to create a starting user_location entry
+    const locationQuery = 'INSERT INTO "user_location" (user_id) VALUES ($1)';
+    await pool.query(locationQuery, [userId])
+
+    await connection.query('COMMIT');
+    res.sendStatus(201)
+
+  } catch ( err ) {
+
+    await connection.query('ROLLBACK');
+    console.log(`Transaction Error - Rolling back new account`, error);
+    res.sendStatus(500);
+
+  } finally {
+    connection.release()
+  }
 });
 
 // Handles login form authenticate/login POST

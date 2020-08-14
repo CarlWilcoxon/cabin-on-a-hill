@@ -1,8 +1,7 @@
 CREATE TABLE "user" (
   "id" SERIAL PRIMARY KEY,
   "username" VARCHAR (80) UNIQUE NOT NULL,
-  "password" VARCHAR (1000) NOT NULL,
-  "current_location_id" INT DEFAULT 1
+  "password" VARCHAR (1000) NOT NULL
 );
 
 CREATE TABLE "items_carried" (
@@ -61,7 +60,7 @@ CREATE TABLE "command" (
   "grab_item_id" INT
 );
 
-                           
+
 INSERT INTO "command" ("id", "command_name",  "required_item_id", "required_location_id", "success_text", "failure_text", "server_keyword", "grab_item_id")
 VALUES (1, 'LOOK', null, null, null, 'You don''t see that.', 'LOOK', null),
 (2, 'USE BLINDS', null, 1, 'You are swallowed up by darkness.', 'You don''t know how to do that.', 'DIE', null),
@@ -141,7 +140,24 @@ VALUES ('Clean up room', 1, 2, 8),
 ('Light a candle in the hallway', 9, 10, 3),
 ('Light a candle in the bedroom', 2, 12, 3);
 
-ALTER TABLE "location" ADD FOREIGN KEY ("item_found_here_id") REFERENCES "item" ("id");
+
+ALTER TABLE "path" ADD FOREIGN KEY ("from_id") REFERENCES "location" ("id");
+
+ALTER TABLE "path" ADD FOREIGN KEY ("to_id") REFERENCES "location" ("id");
+
+ALTER TABLE "command" ADD FOREIGN KEY ("required_location_id") REFERENCES "location" ("id");
+
+ALTER TABLE "command" ADD FOREIGN KEY ("required_item_id") REFERENCES "item" ("id");
+
+ALTER TABLE "synonym_list" ADD FOREIGN KEY ("command_id") REFERENCES "command" ("id");
+
+ALTER TABLE "item_state" ADD FOREIGN KEY ("user_id") REFERENCES "user" ("id");
+
+ALTER TABLE "item_state" ADD FOREIGN KEY ("item_id") REFERENCES "item" ("id");
+
+ALTER TABLE "user_location" ADD FOREIGN KEY ("location_id") REFERENCES "location" ("id");
+
+ALTER TABLE "user" ADD FOREIGN KEY ("id") REFERENCES "user_location" ("user_id");
 
 COMMENT ON TABLE "location" IS 'map nodes';
 
