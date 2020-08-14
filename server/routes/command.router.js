@@ -58,14 +58,14 @@ router.post('/:search', rejectUnauthenticated, async (req, res) => {
             // if they are then add the correct item to the items_carried table
             const grabQuery = `INSERT INTO "items_carried" ("user_id", "item_id")
                               VALUES ( $1 , $2 );`
-            const grabValues = [ req.user.id, result.rows.server_target_id ];
+            const grabValues = [ req.user.id, result.rows.grab_item_id ];
             await connection.query( grabQuery, grabValues );
 
           // make sure the user is in the correct location
           if (req.user.current_location_id === result.rows[i].required_location_id) {
             //if they are then look for the path that matches the command_id
             const pathQuery = `SELECT * FROM "path"
-                              WHERE "command_word_id" = $1;`
+                              WHERE "command_id" = $1;`
             const pathValue = [ result.rows[i].id ];
             const path = await connection.query( pathQuery , pathValue );
 
@@ -103,7 +103,7 @@ router.post('/:search', rejectUnauthenticated, async (req, res) => {
           if (req.user.current_location_id === result.rows[i].required_location_id) {
             //if they are then look for the path that matches the command_id
             const pathQuery = `SELECT * FROM "path"
-                              WHERE "command_word_id" = $1;`
+                              WHERE "command_id" = $1;`
             const pathValue = [ result.rows[i].id ];
             const path = await connection.query( pathQuery , pathValue );
 

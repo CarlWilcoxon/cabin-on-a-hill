@@ -58,11 +58,11 @@ CREATE TABLE "command" (
   "success_text" VARCHAR (1000),
   "failure_text" VARCHAR (1000),
   "server_keyword" VARCHAR (30),
-  "server_target_id" INT
+  "grab_item_id" INT
 );
 
                            
-INSERT INTO "command" ("id", "command_name",  "required_item_id", "required_location_id", "success_text", "failure_text", "server_keyword", "server_target_id")
+INSERT INTO "command" ("id", "command_name",  "required_item_id", "required_location_id", "success_text", "failure_text", "server_keyword", "grab_item_id")
 VALUES (1, 'LOOK', null, null, null, 'You don''t see that.', 'LOOK', null),
 (2, 'USE BLINDS', null, 1, 'You are swallowed up by darkness.', 'You don''t know how to do that.', 'DIE', null),
 (3, 'LIGHT CANDLE', 5, null, 'You light the candle.', 'You don''t know how to do that.', 'GRAB', 4),
