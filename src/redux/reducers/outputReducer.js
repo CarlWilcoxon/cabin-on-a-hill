@@ -1,15 +1,26 @@
 const output = (state = ['You wake up on the floor of your bedroom. Morning light pours in through the BLINDS.'], action) => {
   // Use a switch statement to account for synonyms
   switch (action.type) {
-    case 'STAND':
-      return ['You are now standing'];
-    case 'RISE':
-      return ['You are now standing'];
-    case 'KNEEL':
-      return ['You are now kneeling'];
-    case 'PRONE':
-      return ['You are now prone'];
+    case 'CLEAR':
+      return [];
+    case 'OUTPUT':
+      console.log('inside OUTPUT', action.payload);
 
+      if (action.payload.length === 0) {
+        return [...state, "I don't know what you mean by that." ];
+
+        // } else if ( typeof(action.payload[0]) === 'object' ) {
+      //   // If the action was successful, print the success text
+      //   // If the action failed, print the failure text
+      //   return [...state, (action.payload[0].successful) ? action.payload[0].success_text : action.payload[0].failure_text ];
+
+      } else if ( typeof(action.payload) === 'object' ) {
+        // If the action was successful, print the success text
+        // If the action failed, print the failure text
+        return [...state, (action.payload.successful) ? action.payload.success_text : action.payload.failure_text ];
+      } else {
+        return [...state, action.payload];
+      }
     default:
       return state;
   }
