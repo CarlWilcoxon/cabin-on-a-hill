@@ -47,7 +47,7 @@ VALUES ('LOOK', 1),
 ('GRAB CANDLE', 11),
 ('GRAB CANDLE', 12),
 ('GRAB CANDLE', 13),
-('WEST', 14)
+('WEST', 14),
 ('GO WEST', 14);
 
 CREATE TABLE "command" (
@@ -61,7 +61,7 @@ CREATE TABLE "command" (
   "server_target_id" INT
 );
 
-
+                           
 INSERT INTO "command" ("id", "command_name",  "required_item_id", "required_location_id", "success_text", "failure_text", "server_keyword", "server_target_id")
 VALUES (1, 'LOOK', null, null, null, 'You don''t see that.', 'LOOK', null),
 (2, 'USE BLINDS', null, 1, 'You are swallowed up by darkness.', 'You don''t know how to do that.', 'DIE', null),
@@ -125,38 +125,23 @@ CREATE TABLE "path" (
   "command_id" INT
   );
 
-INSERT INTO "path" ( "id", "path_name", "from_id", "to_id", "command_id" )
-VALUES (1, 'Clean up room', 1, 2, 8),
-(2, 'West from clean bedroom to dark hallway', 2 , 7 , 7),
-(3, 'East from dark hallway to clean bedroom', 7, 2, 5),
-(4, 'North from dark hallway to default bathroom', 9 , 3 , 4),
-(5, 'South from bathroom to dark hallway', 8, 9),
-(6, 'Light a candle in the bathroom open', 6, 11, 3),
-(7, 'Light a candle in the bathroom closed', 4, 14, 3),
-(8, 'Light a candle in the hallway', 9, 10, 3),
-(9, 'Light a candle in the bedroom', 2, 12, 3);
+INSERT INTO "path" ( "path_name", "from_id", "to_id", "command_id" )
+VALUES ('Clean up room', 1, 2, 8),
+('West from clean bedroom to dark hallway', 2 , 7 , 7),
+('East from dark hallway to clean bedroom', 7, 2, 5),
+('North from dark hallway to default bathroom', 9 , 3 , 4),
+('South from default bathroom to dark hallway', 3, 9, 6),
+('South from default bathroom to dark hallway', 4, 9, 6),
+('South from default bathroom to dark hallway', 5, 9, 6),
+('South from default bathroom to dark hallway', 6, 9, 6),
+('South from default bathroom to dark hallway', 7, 9, 6),
+('South from default bathroom to dark hallway', 8, 9, 6),
+('Light a candle in the bathroom open', 6, 11, 3),
+('Light a candle in the bathroom closed', 4, 14, 3),
+('Light a candle in the hallway', 9, 10, 3),
+('Light a candle in the bedroom', 2, 12, 3);
 
 ALTER TABLE "location" ADD FOREIGN KEY ("item_found_here_id") REFERENCES "item" ("id");
-
-ALTER TABLE "path" ADD FOREIGN KEY ("from_id") REFERENCES "location" ("id");
-
-ALTER TABLE "path" ADD FOREIGN KEY ("to_id") REFERENCES "location" ("id");
-
-ALTER TABLE "command" ADD FOREIGN KEY ("required_location_id") REFERENCES "location" ("id");
-
-ALTER TABLE "command" ADD FOREIGN KEY ("required_item_id") REFERENCES "item" ("id");
-
-ALTER TABLE "synonym_list" ADD FOREIGN KEY ("command_id") REFERENCES "command" ("id");
-
-ALTER TABLE "items_carried" ADD FOREIGN KEY ("user_id") REFERENCES "user" ("id");
-
-ALTER TABLE "items_carried" ADD FOREIGN KEY ("item_id") REFERENCES "item" ("id");
-
-ALTER TABLE "location" ADD FOREIGN KEY ("id") REFERENCES "user" ("current_location_id");
-
-ALTER TABLE "location_complete" ADD FOREIGN KEY ("location_id") REFERENCES "location" ("id");
-
-ALTER TABLE "location_complete" ADD FOREIGN KEY ("user_id") REFERENCES "user" ("id");
 
 COMMENT ON TABLE "location" IS 'map nodes';
 
