@@ -26,7 +26,6 @@ class Game extends Component {
     event.preventDefault();
 
     let arrayOfWords = this.state.currentInput.toUpperCase().split(' ');
-
     this.setState({
       ...this.state,
       arrayOfWords,

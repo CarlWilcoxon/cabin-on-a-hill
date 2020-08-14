@@ -53,8 +53,8 @@ router.post('/:search', rejectUnauthenticated, async (req, res) => {
       //  grab handler
         case 'GRAB':
           // make sure the user is in the correct location or there is no location restriction
-          if ((req.user.current_location_id === result.rows.required_location_id
-            || result.rows.required_location_id === null) || (  TODO )) {
+          if ((req.user.current_location_id === result.rows[i].required_location_id
+            || result.rows[i].required_location_id === null)) {
             // if they are then add the correct item to the items_carried table
             const grabQuery = `INSERT INTO "items_carried" ("user_id", "item_id")
                               VALUES ( $1 , $2 );`
