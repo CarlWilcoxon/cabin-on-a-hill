@@ -24,6 +24,7 @@ function* checkCommand(action) {
         // filter out the failed actions, unless everything failed
         // if everything failed then only let one response through
         let allFailed = true;
+        console.log(response.data)
         for (let i = 0; i < response.data.length; i++) {
           if (response.data[i].successful) {
             allFailed = false;
@@ -34,6 +35,8 @@ function* checkCommand(action) {
           yield put({ type: 'OUTPUT', payload: response.data[0] })
         }
     }
+  // refresh room data
+  yield put({ type: 'FETCH_ROOM' });
 
   } catch (error) {
     console.log('User get request failed', error);

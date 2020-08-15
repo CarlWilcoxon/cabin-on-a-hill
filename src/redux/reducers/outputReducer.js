@@ -6,13 +6,9 @@ const output = (state = ['You wake up on the floor of your bedroom. Morning ligh
     case 'OUTPUT':
       console.log('inside OUTPUT', action.payload);
 
+      // if no commands matched the input, say "I don't know what you mean by that."
       if (action.payload === undefined) {
         return [...state, "I don't know what you mean by that." ];
-
-        // } else if ( typeof(action.payload[0]) === 'object' ) {
-      //   // If the action was successful, print the success text
-      //   // If the action failed, print the failure text
-      //   return [...state, (action.payload[0].successful) ? action.payload[0].success_text : action.payload[0].failure_text ];
 
       } else if ( typeof(action.payload) === 'object' ) {
         // If the action was successful, print the success text

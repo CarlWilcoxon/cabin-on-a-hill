@@ -17,8 +17,9 @@ function* registerUser(action) {
     // after registration or after they log out
     yield put({type: 'SET_TO_LOGIN_MODE'});
 
-    // creates a location entry for the new user
+    // create an entry for the user's starting location
     yield axios.post('/api/room');
+    yield put({ type: 'FETCH_ROOM' });
 
   } catch (error) {
       console.log('Error with user registration:', error);
