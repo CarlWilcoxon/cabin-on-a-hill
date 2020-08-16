@@ -40,7 +40,7 @@ class Game extends Component {
 
     console.log(arrayOfWords);
     // if they are trying to LOOK around the room, I don't need to talk to the server
-    if (arrayOfWords.length === 1 && arrayOfWords[0] === "LOOK" ) {
+    if (arrayOfWords.length === 1 && (arrayOfWords[0] === "LOOK" || arrayOfWords[0] === "EXAMINE" )) {
       // update the room reducer
       this.props.dispatch({
         type: 'FETCH_ROOM'

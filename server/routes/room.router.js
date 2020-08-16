@@ -21,9 +21,12 @@ router.get('/', rejectUnauthenticated, (req, res) => {
  * POST route template
  */
 router.post('/', rejectUnauthenticated, (req, res) => {
-  const queryText = 'INSERT INTO "user_location" (user_id) VALUES $1;';
+  console.log('Making room for', req.user);
+  const queryText = 'INSERT INTO "user_location" (user_id) VALUES ($1);';
   pool.query(queryText, [req.user.id])
-      .then((result) => res.send(result.rows))
+      .then((result) => {
+        console.log(result.rows);
+        res.send(result.rows);})
       .catch(() => res.sendStatus(500));
 });
 

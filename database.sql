@@ -23,10 +23,11 @@ CREATE TABLE "synonym_list" (
 );
 
 INSERT INTO "synonym_list" ("synonym", "command_id")
-VALUES ('LOOK', 1),
-('EXAMINE', 1),
+VALUES 
 ('USE BLINDS', 2),
-('LIGHT CANDLE', 3),
+('USE BLINDS', 16),
+('USE BLINDS', 17),
+('LIGHT LANTERN', 3),
 ('NORTH', 4),
 ('GO NORTH', 4),
 ('EAST', 5),
@@ -49,7 +50,8 @@ VALUES ('LOOK', 1),
 ('WEST', 14),
 ('GO WEST', 14),
 ('OPEN DOOR', 15),
-('OPEN', 15);
+('OPEN', 15),
+('DIE', 19);
 
 CREATE TABLE "command" (
   "id" SERIAL PRIMARY KEY,
@@ -66,7 +68,7 @@ CREATE TABLE "command" (
 INSERT INTO "command" ("id", "command_name",  "required_item_id", "required_location_id", "success_text", "failure_text", "server_keyword", "grab_item_id")
 VALUES (1, 'LOOK', null, null, null, 'You don''t see that.', 'LOOK', null),
 (2, 'USE BLINDS', null, 1, 'You are swallowed up by darkness.', 'You don''t know how to do that.', 'DIE', null),
-(3, 'LIGHT CANDLE', 5, null, 'You light the candle.', 'You don''t know how to do that.', 'GRAB', 4),
+(3, 'LIGHT LANTERN', 3, 9, 'You light the LANTERN.', 'You don''t know how to do that.', 'MOVE', null),
 (4, 'NORTH', null, null, 'You head NORTH.', 'You walk into the wall.', 'MOVE', null),
 (5, 'EAST', null, null, 'You head EAST.', 'You walk into the wall.', 'MOVE', null),
 (6, 'SOUTH', null, null, 'You head SOUTH.', 'You walk into the wall.', 'MOVE', null),
@@ -80,7 +82,9 @@ VALUES (1, 'LOOK', null, null, null, 'You don''t see that.', 'LOOK', null),
 (14, 'WEST', null, 9, 'You are swallowed up by darkness.', 'Error Code 14', 'DIE', null),
 (15, 'OPEN BEDROOM DOOR', null, 15, 'The door swings open with a creak and then gets stuck on a lego.', 'You don''t think you can do that.', 'MOVE', null),
 (16, 'USE BLINDS open bedroom', null, 2, 'You are swallowed up by darkness.', 'You don''t know how to do that.', 'DIE', null),
-(17, 'USE BLINDS closed bedroom', null, 15, 'You are swallowed up by darkness.', 'You don''t know how to do that.', 'DIE', null);
+(17, 'USE BLINDS closed bedroom', null, 15, 'You are swallowed up by darkness.', 'You don''t know how to do that.', 'DIE', null),
+(18, 'LANTERN ALREADY LIT', 3, 10, 'The LANTERN is already lit.', 'You don''t know how to do that.', 'MOVE', null),
+(19, 'DIE', null, null, 'You fall over dead.', '???', 'DIE', null);
 
 CREATE TABLE "item" (
   "id" SERIAL PRIMARY KEY,
@@ -94,7 +98,8 @@ VALUES (1, 'BACKPACK','It holds stuff for you.'),
 (2, 'CANDLE', 'It smells like flowers.'),
 (3, 'LIGHTER', 'Don''t play with it.'),
 (4, 'LIT CANDLE', 'It gives off a faint glow and pleasant smell.'),
-(5, 'Candle & Lighter', 'Meta-item');
+(5, 'Candle & Lighter', 'Meta-item'),
+(6, 'Knife', '');
 
 CREATE TABLE "location" (
   "id" SERIAL PRIMARY KEY,
@@ -106,17 +111,19 @@ CREATE TABLE "location" (
 
 INSERT INTO "location" ("id", "name", "slug", "description", "item_found_here_id" )
 VALUES (1, 'Bedroom', 'Dirty Bedroom', 'Your bedroom looks so dirty that you don''t think you could even OPEN the DOOR.', 1),
-(2, 'Bedroom', 'Clean Bedroom Open Door', 'You look out into an ominous looking hallway to the WEST.', null),
-(3, 'Bathroom', 'Bathroom default', 'There is a short CANDLE sitting on the tank of the TOILET. A medicine CABINET with a crack in the glass hangs at an angle over the sink.', 2),
-(4, 'Bathroom', 'Bathroom closed candle taken', 'There is a dirty TOILET. A medicine CABINET with a crack in the glass hangs ajar over the sink.', null),
-(5, 'Bathroom', 'Bathroom open candle taken', 'There is a dirty TOILET. A medicine CABINET over the sink is open, inside you see a LIGHTER.', 3),
+(2, 'Bedroom', 'Clean Bedroom Open Door', 'You are standing in your bedroom and look out into an ominous looking hallway to the WEST.', null),
+(3, 'Bathroom', 'Bathroom default', 'There is . A medicine CABINET with a crack in the glass hangs at an angle over the rust-stained SINK.', 2),
+
 (6, 'Bathroom', 'Bathroom open candle + lighter taken', 'There is a dirty TOILET. A medicine CABINET over the sink is open and empty.', null),
-(7, 'Bathroom', 'Bathroom open', 'There is a short CANDLE sitting on the tank of the TOILET. A medicine CABINET over the sink is open, inside you see a LIGHTER.', 4),
+(7, 'Bathroom', 'Bathroom open', 'There is a dirty . A medicine CABINET over the sink is open, inside you see a LIGHTER.', 4),
 (8, 'Bathroom', 'Bathroom open lighter taken', 'There is a short CANDLE sitting on the tank of the TOILET. A medicine CABINET over the sink is open and empty.', 2 ),
-(9, 'Hallway', 'Hallway dark', 'You stand in a dark and spooky hallway, you can''t even see the WEST end. You notice an open doorway next to you to the NORTH, and the DOOR leading EAST to your bedroom.',null),
-(10, 'Hallway', 'Hallway Bright', 'You stand in a long and spooky hallway, your little candle lights the way to the KITCHEN to the WEST. You notice a DOOR next to you to the NORTH, and a DOOR leading EAST to your bedroom.',null),
+
+(9, 'Hallway', 'Hallway dark', 'You stand in a dark and spooky hallway, you can''t even see the WEST end. There is an unlit LANTERN in a wall sconce. You notice an open doorway next to you to the NORTH, and the DOOR leading EAST to your bedroom.',null),
+(10, 'Hallway', 'Hallway Bright', 'You stand in a long hallway, the LANTERN lights the way to the KITCHEN to the WEST. You notice a DOOR next to you to the NORTH, and a DOOR leading EAST to your bedroom.',null),
+
 (11, 'Bathroom', 'Bathroom Bright open', 'There is a dirty TOILET. A medicine CABINET over the sink is open and empty. You are holding a lit candle.', null),
 (12, 'Bedroom', 'Bright Bedroom', 'Your bedroom looks pretty good now, and smells nice with the candle you are holding.', null),
+
 (13, 'Kitchen', 'Win condition', 'You make it to the kitchen.', null),
 (14, 'Bathroom', 'Bathroom Bright closed', 'There is a dirty TOILET. A medicine CABINET over the sink is closed. You are holding a lit candle.', null),
 (15, 'Bedroom', 'Clean Bedroom closed Door', 'Your bedroom looks much cleaner now.', null);
@@ -128,7 +135,7 @@ CREATE TABLE "path" (
   "from_id" INT,
   "to_id" INT,
   "command_id" INT
-  );
+);
 
 INSERT INTO "path" ( "path_name", "from_id", "to_id", "command_id" )
 VALUES ('Clean up room', 1, 15, 8),
@@ -136,33 +143,33 @@ VALUES ('Clean up room', 1, 15, 8),
 ('East from dark hallway to clean bedroom', 7, 2, 5),
 ('North from dark hallway to default bathroom', 9 , 3 , 4),
 ('South from default bathroom to dark hallway', 3, 9, 6),
-('South from default bathroom to dark hallway', 4, 9, 6),
-('South from default bathroom to dark hallway', 5, 9, 6),
-('South from default bathroom to dark hallway', 6, 9, 6),
-('South from default bathroom to dark hallway', 7, 9, 6),
-('South from default bathroom to dark hallway', 8, 9, 6),
+('South from bathroom to dark hallway', 4, 9, 6),
+('South from bathroom to dark hallway', 5, 9, 6),
+('South from bathroom to dark hallway', 6, 9, 6),
+('South from bathroom to dark hallway', 7, 9, 6),
+('South from bathroom to dark hallway', 8, 9, 6),
 ('Light a candle in the bathroom open', 6, 11, 3),
 ('Light a candle in the bathroom closed', 4, 14, 3),
 ('Light a candle in the hallway', 9, 10, 3),
 ('Light a candle in the bedroom', 2, 12, 3),
 ('Open Bedroom door', 15, 2, 15);
 
-ALTER TABLE "path" ADD FOREIGN KEY ("from_id") REFERENCES "location" ("id");
+--ALTER TABLE "path" ADD FOREIGN KEY ("from_id") REFERENCES "location" ("id");
 
-ALTER TABLE "path" ADD FOREIGN KEY ("to_id") REFERENCES "location" ("id");
+--ALTER TABLE "path" ADD FOREIGN KEY ("to_id") REFERENCES "location" ("id");
 
-ALTER TABLE "command" ADD FOREIGN KEY ("required_location_id") REFERENCES "location" ("id");
+--ALTER TABLE "command" ADD FOREIGN KEY ("required_location_id") REFERENCES "location" ("id");
 
-ALTER TABLE "command" ADD FOREIGN KEY ("required_item_id") REFERENCES "item" ("id");
+--ALTER TABLE "command" ADD FOREIGN KEY ("required_item_id") REFERENCES "item" ("id");
 
-ALTER TABLE "synonym_list" ADD FOREIGN KEY ("command_id") REFERENCES "command" ("id");
+--ALTER TABLE "synonym_list" ADD FOREIGN KEY ("command_id") REFERENCES "command" ("id");
 
-ALTER TABLE "items_carried" ADD FOREIGN KEY ("user_id") REFERENCES "user" ("id");
+--ALTER TABLE "items_carried" ADD FOREIGN KEY ("user_id") REFERENCES "user" ("id");
 
-ALTER TABLE "items_carried" ADD FOREIGN KEY ("item_id") REFERENCES "item" ("id");
+--ALTER TABLE "items_carried" ADD FOREIGN KEY ("item_id") REFERENCES "item" ("id");
 
-ALTER TABLE "user_location" ADD FOREIGN KEY ("location_id") REFERENCES "location" ("id");
+--ALTER TABLE "user_location" ADD FOREIGN KEY ("location_id") REFERENCES "location" ("id");
 
-COMMENT ON TABLE "location" IS 'map nodes';
+--COMMENT ON TABLE "location" IS 'map nodes';
 
-COMMENT ON TABLE "path" IS 'map edges';
+--COMMENT ON TABLE "path" IS 'map edges';

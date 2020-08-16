@@ -93,7 +93,7 @@ router.post('/:search', rejectUnauthenticated, async (req, res) => {
             }
           }
             break;
-        //  move handler
+      //  move handler
         case 'MOVE':
           // make sure the user is in the correct location and has any needed items
           if ((currentLocation.rows[0].location_id === result.rows[i].required_location_id
@@ -119,7 +119,7 @@ router.post('/:search', rejectUnauthenticated, async (req, res) => {
             }
           }
           break;
-          //  die handler
+      //  die handler
         case 'DIE':
           // make sure the user is in the correct location and has any needed items
           if ((currentLocation.rows[0].location_id === result.rows[i].required_location_id
@@ -145,10 +145,21 @@ router.post('/:search', rejectUnauthenticated, async (req, res) => {
               ...result.rows[i],
               successful : true,
             }
-            break;
           }
-
+          break;
+        case 'JOKE':
+        // make sure the user is in the correct location and has any needed items
+          if ((currentLocation.rows[0].location_id === result.rows[i].required_location_id || result.rows[i].required_location_id === null)
+            && (inventory.rows.includes(result.rows[i].required_item_id) || result.rows[i].required_item_id === null)) {
+            // mark that the action was successful
+              result.rows[i] = {
+              ...result.rows[i],
+            successful : true,
+            }
+          } // end if
+          break;
       }
+
     }
 
     // End transaction with COMMIT
