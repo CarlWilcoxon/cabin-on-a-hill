@@ -28,7 +28,6 @@ VALUES
 ('USE BLINDS', 16),
 ('USE BLINDS', 17),
 ('LIGHT LANTERN', 3),
-('LIGHT LANTERN', 18),
 ('NORTH', 4),
 ('GO NORTH', 4),
 ('EAST', 5),
@@ -87,7 +86,6 @@ VALUES (1, 'LOOK', null, null, null, 'You don''t see that.', 'LOOK', null),
 (15, 'OPEN BEDROOM DOOR', null, 15, 'The door swings open with a creak and then gets stuck on a lego.', 'You don''t think you can do that.', 'GRAB', 1),
 (16, 'USE BLINDS open bedroom', null, 2, 'You are swallowed up by darkness.', 'You don''t know how to do that.', 'DIE', null),
 (17, 'USE BLINDS closed bedroom', null, 15, 'You are swallowed up by darkness.', 'You don''t know how to do that.', 'DIE', null),
-(18, 'LANTERN ALREADY LIT', 3, 10, 'The LANTERN is already lit.', 'You don''t know how to do that.', 'MOVE', null),
 (19, 'DIE', null, null, 'You fall over dead.', '???', 'DIE', null),
 (20, 'TRY TO CLOSE BEDROOM DOOR', 1, 2,'It''s stuck on a lego... I guess you didn''t clean your room that well...', 'You can''t do that here.', 'JOKE',null),
 (21, 'TRY TO CLOSE BEDROOM DOOR', 1, 12,'It''s stuck on a lego... I guess you didn''t clean your room that well...', 'You can''t do that here.', 'JOKE',null),
@@ -126,10 +124,10 @@ CREATE TABLE "location" (
 INSERT INTO "location" ("id", "name", "slug", "description", "item_found_here_id" )
 VALUES (1, 'Bedroom', 'Dirty Bedroom', 'Your bedroom looks so dirty that you can''t even get to the DOOR.', 1),
 (2, 'Bedroom', 'Clean Bedroom Open Door', 'You are standing in your bedroom and look out into an ominous looking hallway to the WEST.', null),
-(3, 'Bathroom', 'Bathroom default', 'There is a shiny porcelain toilet without any water in the bowl. The medicine CABINET with a crack in the glass hangs at an angle over a rust-stained SINK.', 2),
+(3, 'Bathroom', 'Bathroom default', 'There is a shiny porcelain toilet without any water in the bowl. The medicine CABINET with a crack in the glass hangs at an angle over a rust-stained SINK.', null),
 
-(7, 'Bathroom', 'Bathroom open', 'There is a shiny porcelain toilet without any water in the bowl. The medicine CABINET over the SINK is open, inside you see a LIGHTER.', 4),
-(8, 'Bathroom', 'Bathroom open lighter taken', 'There is a shiny porcelain toilet without any water in the bowl. The medicine CABINET over the SINK is open and empty.', 2 ),
+(7, 'Bathroom', 'Bathroom open', 'There is a shiny porcelain toilet without any water in the bowl. The medicine CABINET over the SINK is open, inside you see a LIGHTER.', 3),
+(8, 'Bathroom', 'Bathroom open lighter taken', 'There is a shiny porcelain toilet without any water in the bowl. The medicine CABINET over the SINK is open and empty.', null ),
 
 (9, 'Hallway', 'Hallway dark', 'You stand in a dark and spooky hallway, you can''t even see the WEST end. There is an unlit LANTERN in a wall sconce. You notice an open doorway next to you to the NORTH, and the DOOR leading EAST to your bedroom.',null),
 (10, 'Hallway', 'Hallway Bright', 'You stand in a long hallway, the LANTERN lights the way to the KITCHEN to the WEST. You notice a DOOR next to you to the NORTH, and a DOOR leading EAST to your bedroom.',null),
@@ -169,7 +167,10 @@ VALUES ('Clean up room', 1, 15, 8),
 ('Close cabinet', 8, 3, 24),
 ('Close cabinet', 7, 3, 24),
 ('Open cabinet', 3, 7, 11),
-('Open cabinet, no lighter', 3, 8, 12);
+('Open cabinet, no lighter', 3, 8, 12),
+('Grab lighter', 7, 8, 10),
+('Light lantern', 9, 10, 3),
+('bright hall to kitchen', 10, 13, 7);
 
 --ALTER TABLE "path" ADD FOREIGN KEY ("from_id") REFERENCES "location" ("id");
 

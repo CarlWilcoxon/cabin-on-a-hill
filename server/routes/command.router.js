@@ -62,7 +62,7 @@ router.post('/:search', rejectUnauthenticated, async (req, res) => {
             // if they are then add the correct item to the items_carried table
             const grabQuery = `INSERT INTO "items_carried" ("user_id", "item_id")
                               VALUES ( $1 , $2 );`
-            const grabValues = [ req.user.id, result.rows.grab_item_id ];
+            const grabValues = [ req.user.id, result.rows[i].grab_item_id ];
             await connection.query( grabQuery, grabValues );
 
             // make sure the user is in the correct location
@@ -78,12 +78,6 @@ router.post('/:search', rejectUnauthenticated, async (req, res) => {
                               WHERE "user_id" = $2;`
             const moveValue = [ path.rows[0].to_id , req.user.id ];
             await connection.query( moveQuery, moveValue );
-
-            // update the client-side location
-            const newRoomQuery = `SELECT * FROM "location"
-                                  WHERE "id" = $1;`
-            const newRoomValue = [ path.rows[0].to_id ]
-            const newRoom = await connection.query( newRoomQuery, newRoomValue )
 
             // Update the variables to indicate what was done and tell the client
             // how to handle the response.
