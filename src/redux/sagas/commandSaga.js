@@ -28,7 +28,12 @@ function* checkCommand(action) {
         for (let i = 0; i < response.data.length; i++) {
           if (response.data[i].successful) {
             allFailed = false;
-            yield put({ type: 'OUTPUT', payload: response.data[i] })
+            // if the character died, set TYPE to dead
+            if (response.data[i].server_keyword === 'DIE') {
+              yield put({ type: 'DEAD' });
+            } else {
+              yield put({ type: 'OUTPUT', payload: response.data[i] })
+            }
           }
         }
         if (allFailed) {

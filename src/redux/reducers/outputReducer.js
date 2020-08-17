@@ -3,6 +3,9 @@ const output = (state = ['You wake up on the floor of your bedroom. Morning ligh
   switch (action.type) {
     case 'CLEAR':
       return [];
+    // if the user died, display only the starting text
+    case 'DEAD':
+      return ['You are swallowed up by darkness...', 'You wake up on the floor of your bedroom. Morning light pours in through the BLINDS.'];
     case 'OUTPUT':
       console.log('inside OUTPUT', action.payload);
 
@@ -15,6 +18,7 @@ const output = (state = ['You wake up on the floor of your bedroom. Morning ligh
         // If the action failed, print the failure text
         return [...state, (action.payload.successful) ? action.payload.success_text : action.payload.failure_text ];
       } else {
+        // This handles LOOKing, a string will be passed and appended to the display
         return [...state, action.payload];
       }
     default:
