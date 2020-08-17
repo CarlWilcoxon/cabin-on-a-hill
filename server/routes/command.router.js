@@ -5,13 +5,6 @@ const { rejectUnauthenticated } = require('../modules/authentication-middleware'
 const { useReducer } = require('react');
 
 /**
- * GET route template
-//  */
-// router.get('/', rejectUnauthenticated, (req, res) => {
-
-// });
-
-/**
  * POST route template
  */
 router.post('/:search', rejectUnauthenticated, async (req, res) => {
@@ -40,8 +33,16 @@ router.post('/:search', rejectUnauthenticated, async (req, res) => {
     // Save the result so we can get the returned value
     const inventory = await connection.query( invQuery, invValues );
 
-    console.log(inventory.rows);
-    console.log(result.rows);
+    // Load the user's current location
+    const locationQuery = `SELECT * FROM "location"
+                          JOIN "user_location" ON user_location.location_id = location.id
+                          WHERE user_id= $1`;
+    // save the result so we can use it later
+    const currentLocation = (await connection.query(locationQuery, [req.user.id]));
+
+    console.log('current location:', currentLocation.rows[0]);
+    console.log('current inventory:', inventory.rows);
+    console.log('commands to try:', result.rows);
     // check each entry from the synonym list that was returned
     for (let i = 0; i < result.rows.length; i++) {
       result.rows[i] = {
@@ -53,16 +54,18 @@ router.post('/:search', rejectUnauthenticated, async (req, res) => {
       //  grab handler
         case 'GRAB':
           // make sure the user is in the correct location or there is no location restriction
-          if ((req.user.current_location_id === result.rows[i].required_location_id
-            || result.rows[i].required_location_id === null)) {
+          // same check for items
+          if ((currentLocation.rows[0].location_id === result.rows[i].required_location_id
+            || result.rows[i].required_location_id === null) &&
+            (inventory.rows.includes(result.rows[i].required_item_id)
+              || result.rows[i].required_item_id === null)) {
             // if they are then add the correct item to the items_carried table
             const grabQuery = `INSERT INTO "items_carried" ("user_id", "item_id")
                               VALUES ( $1 , $2 );`
             const grabValues = [ req.user.id, result.rows.grab_item_id ];
             await connection.query( grabQuery, grabValues );
 
-          // make sure the user is in the correct location
-          if (req.user.current_location_id === result.rows[i].required_location_id) {
+            // make sure the user is in the correct location
             //if they are then look for the path that matches the command_id
             const pathQuery = `SELECT * FROM "path"
                               WHERE "command_id" = $1;`
@@ -72,9 +75,9 @@ router.post('/:search', rejectUnauthenticated, async (req, res) => {
             // move the user along the path
             const moveQuery = `UPDATE "user_location"
                               SET "location_id" = $1
-                              WHERE "id" = $2;`
+                              WHERE "user_id" = $2;`
             const moveValue = [ path.rows[0].to_id , req.user.id ];
-            await connection.query( moveQuery, moveValue);
+            await connection.query( moveQuery, moveValue );
 
             // update the client-side location
             const newRoomQuery = `SELECT * FROM "location"
@@ -82,13 +85,6 @@ router.post('/:search', rejectUnauthenticated, async (req, res) => {
             const newRoomValue = [ path.rows[0].to_id ]
             const newRoom = await connection.query( newRoomQuery, newRoomValue )
 
-            //SEND THE NEWROOM BACK TO THE CLIENT
-            result.rows[i] = {
-              ...result.rows[i],
-            newRoom : newRoom,
-            successful : true,
-            }
-          }
             // Update the variables to indicate what was done and tell the client
             // how to handle the response.
             result.rows[i] = {
@@ -96,11 +92,14 @@ router.post('/:search', rejectUnauthenticated, async (req, res) => {
             successful : true,
             }
           }
-
-        //  move handler
+            break;
+      //  move handler
         case 'MOVE':
-          // make sure the user is in the correct location
-          if (req.user.current_location_id === result.rows[i].required_location_id) {
+          // make sure the user is in the correct location and has any needed items
+          if ((currentLocation.rows[0].location_id === result.rows[i].required_location_id
+            || result.rows[i].required_location_id === null) &&
+            (inventory.rows.includes(result.rows[i].required_item_id)
+              || result.rows[i].required_item_id === null)) {
             //if they are then look for the path that matches the command_id
             const pathQuery = `SELECT * FROM "path"
                               WHERE "command_id" = $1;`
@@ -110,39 +109,57 @@ router.post('/:search', rejectUnauthenticated, async (req, res) => {
             // move the user along the path
             const moveQuery = `UPDATE "user_location"
                               SET "location_id" = $1
-                              WHERE "id" = $2;`
+                              WHERE "user_id" = $2;`
             const moveValue = [ path.rows[0].to_id , req.user.id ];
-            await connection.query( moveQuery, moveValue);
+            await connection.query( moveQuery, moveValue );
 
-            // update the client-side location
-            const newRoomQuery = `SELECT * FROM "location"
-                                  WHERE "id" = $1;`
-            const newRoomValue = [ path.rows[0].to_id ]
-            const newRoom = await connection.query( newRoomQuery, newRoomValue );
-
-            //SEND THE NEWROOM BACK TO THE CLIENT
             result.rows[i] = {
               ...result.rows[i],
-            newRoom : newRoom,
             successful : true,
             }
           }
-
-          //  die handler
+          break;
+      //  die handler
         case 'DIE':
-          // delete items the user acquired
-          const deathQuery = `DELETE FROM "items_carried"
-                              WHERE user_id = $1;`
+          // make sure the user is in the correct location and has any needed items
+          if ((currentLocation.rows[0].location_id === result.rows[i].required_location_id
+            || result.rows[i].required_location_id === null) &&
+            (inventory.rows.includes(result.rows[i].required_item_id)
+              || result.rows[i].required_item_id === null)) {
 
-          await connection.query(deathQuery, [req.user.id] );
+            // delete items the user acquired
+            const deathQuery = `DELETE FROM "items_carried"
+                                WHERE user_id = $1;`
 
-          // move the user back to the starting location
-          const moveQuery = `UPDATE "user_location"
-                              SET "location_id" = 1
-                              WHERE "id" = $1;`
-          await connection.query(moveQuery, [req.user.id] );
+            await connection.query( deathQuery, [req.user.id] );
 
+            // move the user back to the starting location
+            const moveQuery = `UPDATE "user_location"
+                                SET "location_id" = 1
+                                WHERE "user_id" = $1;`
+            await connection.query( moveQuery, [req.user.id] );
+
+            // Update the variables to indicate what was done and tell the client
+            // how to handle the response.
+            result.rows[i] = {
+              ...result.rows[i],
+              successful : true,
+            }
+          }
+          break;
+        case 'JOKE':
+        // make sure the user is in the correct location and has any needed items
+          if ((currentLocation.rows[0].location_id === result.rows[i].required_location_id || result.rows[i].required_location_id === null)
+            && (inventory.rows.includes(result.rows[i].required_item_id) || result.rows[i].required_item_id === null)) {
+            // mark that the action was successful
+              result.rows[i] = {
+              ...result.rows[i],
+            successful : true,
+            }
+          } // end if
+          break;
       }
+
     }
 
     // End transaction with COMMIT

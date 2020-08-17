@@ -1,4 +1,4 @@
-const room = (state = {}, action) => {
+const room = (state = [], action) => {
   switch (action.type) {
     case 'SET_ROOM':
       return action.payload[0];

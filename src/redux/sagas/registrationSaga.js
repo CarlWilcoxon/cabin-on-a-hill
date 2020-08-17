@@ -12,10 +12,15 @@ function* registerUser(action) {
 
     // automatically log a user in after registration
     yield put({ type: 'LOGIN', payload: action.payload });
-    
+
     // set to 'login' mode so they see the login screen
     // after registration or after they log out
     yield put({type: 'SET_TO_LOGIN_MODE'});
+
+    // create an entry for the user's starting location
+    yield axios.post('/api/room');
+    yield put({ type: 'FETCH_ROOM' });
+
   } catch (error) {
       console.log('Error with user registration:', error);
       yield put({type: 'REGISTRATION_FAILED'});
