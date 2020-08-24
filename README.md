@@ -3,7 +3,7 @@
 
 ## Description
 
-_Duration: 2 Week Sprint_
+_Duration: 2 Week Sprint + 1 Day bugfix_
 
 I have not seen a text adventure in years a wanted to try my hand at it. I created it for my Solo Project at Prime Digital Academy.
 
