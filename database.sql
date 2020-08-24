@@ -25,78 +25,150 @@ CREATE TABLE "synonym_list" (
 INSERT INTO "synonym_list" ("synonym", "command_id")
 VALUES 
 ('USE BLINDS', 2),
-('USE BLINDS', 16),
-('USE BLINDS', 17),
-('LIGHT LANTERN', 3),
-('NORTH', 4),
-('GO NORTH', 4),
-('EAST', 5),
-('GO EAST', 5),
-('SOUTH', 6),
-('GO SOUTH', 6),
-('WEST', 7),
-('GO WEST', 7),
-('CLEAN', 8),
-('CLEAN ROOM', 8),
-('CLEAN MESS', 8),
-('CLEAN UP', 8),
-('CLEAN UP ROOM', 8),
-('CLEAN UP MESS', 8),
-('USE SINK', 9),
-('USE SINK', 29),
-('GRAB LIGHTER', 10),
-('WEST', 14),
-('GO WEST', 14),
-('OPEN DOOR', 15),
-('OPEN', 15),
-('DIE', 19),
-('OPEN', 11),
-('OPEN CABINET', 11),
-('CLOSE DOOR', 20),
-('CLOSE DOOR', 21),
-('TACO', 22);
+('USE BLINDS', 3),
+('USE BLINDS', 4),
+('LIGHT LANTERN', 5),
+('DIE', 6),
+
+('NORTH', 7),
+('GO NORTH', 7),
+('NORTH', 8),
+('GO NORTH', 8),
+('NORTH', 9),
+('GO NORTH', 9),
+('NORTH', 10),
+('GO NORTH', 10),
+--('NORTH', 11),
+--('GO NORTH', 11),
+
+('SOUTH', 12),
+('GO SOUTH', 12),
+('SOUTH', 13),
+('GO SOUTH', 13),
+('SOUTH', 14),
+('GO SOUTH', 14),
+('SOUTH', 15),
+('GO SOUTH', 15),
+('SOUTH', 16),
+('GO SOUTH', 16),
+
+('EAST', 17),
+('GO EAST', 17),
+('EAST', 18),
+('GO EAST', 18),
+('EAST', 19),
+('GO EAST', 19),
+
+('WEST', 20),
+('GO WEST', 20),
+('WEST', 21),
+('GO WEST', 21),
+('WEST', 22),
+('GO WEST', 22),
+('WEST', 23),
+('GO WEST', 23),
+
+('CLEAN', 24),
+('CLEAN ROOM', 24),
+('CLEAN MESS', 24),
+('CLEAN UP', 24),
+('CLEAN UP ROOM', 24),
+('CLEAN UP MESS', 24),
+
+('USE SINK', 25),
+('USE SINK', 26),
+('USE SINK', 27),
+('USE SINK', 28),
+
+('GRAB LIGHTER', 29),
+('TAKE LIGHTER', 29),
+('PICK UP LIGHTER', 29),
+('STEAL LIGHTER', 29),
+
+('OPEN', 30),
+('OPEN CABINET', 30),
+('OPEN', 31),
+('OPEN CABINET', 31),
+
+('CLOSE', 32),
+('CLOSE CABINET', 32),
+('CLOSE', 33),
+('CLOSE CABINET', 33),
+
+('OPEN BEDROOM DOOR', 34),
+('OPEN DOOR', 34),
+('OPEN', 34),
+
+('CLOSE DOOR', 35),
+('CLOSE BEDROOM DOOR', 35),
+('CLOSE DOOR', 36),
+('CLOSE BEDROOM DOOR', 36),
+('CLOSE DOOR', 37),
+('CLOSE BEDROOM DOOR', 37),
+
+('TACO', 38);
 
 CREATE TABLE "command" (
   "id" SERIAL PRIMARY KEY,
-  "command_name" VARCHAR (60),
+  "command_slug" VARCHAR (60),
   "required_item_id" INT,
   "required_location_id" INT,
   "success_text" VARCHAR (1000),
   "failure_text" VARCHAR (1000),
   "server_keyword" VARCHAR (30),
-  "grab_item_id" INT
+  "grab_item_id" INT,
+  "destination_id" INT
 );
 
 
-INSERT INTO "command" ("id", "command_name",  "required_item_id", "required_location_id", "success_text", "failure_text", "server_keyword", "grab_item_id")
-VALUES (1, 'LOOK', null, null, null, 'You don''t see that.', 'LOOK', null),
-(2, 'USE BLINDS', null, 1, 'You are swallowed up by darkness.', 'You don''t know how to do that.', 'DIE', null),
-(3, 'LIGHT LANTERN', 3, 9, 'You light the LANTERN.', 'You don''t know how to do that.', 'MOVE', null),
-(4, 'NORTH dark hall to default bathroom', null, 9, 'You head NORTH.', 'You walk into the wall.', 'MOVE', null),
-(5, 'EAST', null, null, 'You head EAST.', 'You walk into the wall.', 'MOVE', null),
-(6, 'SOUTH', null, null, 'You head SOUTH.', 'You walk into the wall.', 'MOVE', null),
-(7, 'WEST', null, null, 'You head WEST.', 'You walk into the wall.', 'MOVE', null),
-(8, 'CLEAN', null, 1, 'You clean your room. You find your old BACKPACK and put it on.', 'What do you want to clean?', 'MOVE', null),
-(9, 'USE SINK', null, 3,'You turn the faucet and murky water starts to dribble out.', 'What sink?', 'JOKE', null),
-(10, 'GRAB LIGHTER', null, 7, 'You pick up the LIGHTER.' , 'You don''t know how to do that.', 'GRAB', 3),
-(11, 'OPEN CABINET', null, 3, 'You open the CABINET and see a LIGHTER inside.', 'What cabinet?', 'MOVE', null),
-(12, 'OPEN CABINET', 3, 3, 'You open the CABINET and it is empty.', 'What cabinet?', 'MOVE', null),
-(13, 'NORTH bright hall to default bathroom', null, 10, 'You head NORTH.', 'You walk into the wall.', 'MOVE', null),
-(14, 'WEST', null, 9, 'You are swallowed up by darkness.', 'Error Code 14', 'DIE', null),
-(15, 'OPEN BEDROOM DOOR', null, 15, 'The door swings open with a creak and then gets stuck on a lego.', 'You don''t think you can do that.', 'GRAB', 1),
-(16, 'USE BLINDS open bedroom', null, 2, 'You are swallowed up by darkness.', 'You don''t know how to do that.', 'DIE', null),
-(17, 'USE BLINDS closed bedroom', null, 15, 'You are swallowed up by darkness.', 'You don''t know how to do that.', 'DIE', null),
-(19, 'DIE', null, null, 'You fall over dead.', '???', 'DIE', null),
-(20, 'TRY TO CLOSE BEDROOM DOOR', 1, 2,'It''s stuck on a lego... I guess you didn''t clean your room that well...', 'You can''t do that here.', 'JOKE',null),
-(21, 'TRY TO CLOSE BEDROOM DOOR', 1, 12,'It''s stuck on a lego... I guess you didn''t clean your room that well...', 'You can''t do that here.', 'JOKE',null),
-(22, 'TACO', null, null, 'Now you feel hungry...', 'You don''t know how TACO.', 'JOKE', null),
-(23, 'CLOSE CABINET', null, 7, 'You close the CABINET.', 'What cabinet?', 'MOVE', null),
-(24, 'CLOSE CABINET', null, 8, 'You close the CABINET.', 'What cabinet?', 'MOVE', null),
-(25, 'North from dark hall to open bathroom lighter taken', 3, 9, 'You head NORTH.', 'You walk into the wall.', 'MOVE', null),
-(26, 'North from dark hall to open bathroom', null, 9, 'You head NORTH.', 'You walk into the wall.', 'MOVE', null),
-(27, 'North from bright hall to open bathroom lighter taken', 3, 10, 'You head NORTH.', 'You walk into the wall.', 'MOVE', null),
-(28, 'North from bright hall to open bathroom', null, 10, 'You head NORTH.', 'You walk into the wall.', 'MOVE', null),
-(29, 'USE SINK', null, 13,'You turn the faucet and murky water starts to dribble out.', 'What sink?', 'JOKE', null);
+INSERT INTO "command" ("id", "command_slug",  "required_item_id", "required_location_id", "success_text", "failure_text", "server_keyword", "grab_item_id", "destination_id")
+VALUES (1, 'LOOK', null, null, 'Error Code 1', 'You don''t see that.', 'LOOK', null, null),
+(2, 'USE BLINDS', null, 1, 'You are swallowed up by darkness.', 'You don''t know how to do that.', 'DIE', null, null),
+(3, 'USE BLINDS open bedroom', null, 2, 'You are swallowed up by darkness.', 'You don''t know how to do that.', 'DIE', null, null),
+(4, 'USE BLINDS closed bedroom', null, 15, 'You are swallowed up by darkness.', 'You don''t know how to do that.', 'DIE', null, null),
+(5, 'LIGHT LANTERN', 3, 9, 'You light the LANTERN.', 'You don''t know how to do that.', 'GRAB', 5, 10),
+(6, 'DIE', null, null, 'You fall over dead.', '???', 'DIE', null, null),
+(7, 'NORTH dark hall to default bath', -3, 9, 'You head NORTH.', 'You walk into the wall.', 'MOVE', null, 3),
+(8, 'NORTH bright hall to default bath', -3, 10, 'You head NORTH.', 'You walk into the wall.', 'MOVE', null, 3),
+(9, 'NORTH bright hall to open bath lighter taken', 3, 10, 'You head NORTH.', 'You walk into the wall.', 'MOVE', null, 8),
+(10, 'NORTH from dark hall to open bath lighter taken', 3, 9, 'You head NORTH.', 'You walk into the wall.', 'MOVE', null, 8),
+--(11, 'NORTH from dark hall to open bath', null, 9, 'You head NORTH.', 'You walk into the wall.', 'MOVE', null, 7),
+
+(12, 'SOUTH from default bath to dark hall', -5, 3, 'You head SOUTH.', 'You walk into the wall.', 'MOVE', null, 9),
+(13, 'SOUTH from open bath to dark hall', -5, 7, 'You head SOUTH.', 'You walk into the wall.', 'MOVE', null, 9),
+(14, 'SOUTH from open bath lighter taken', 3, 8, 'You head SOUTH.', 'You walk into the wall.', 'MOVE', null, 9),
+(15, 'SOUTH from default bath to bright hall', 5, 3, 'You head SOUTH.', 'You walk into the wall.', 'MOVE', null, 10),
+(16, 'SOUTH from open bath to bright hall', 5, 8, 'You head SOUTH.', 'You walk into the wall.', 'MOVE', null, 10),
+
+(17, 'EAST from dark hall to bed', null, 9, 'You head EAST.', 'You walk into the wall.', 'MOVE', null, 2),
+(18, 'EAST from bright hall to bed', 5, 10, 'You head EAST.', 'You walk into the wall.', 'MOVE', null, 2),
+(19, 'EAST from kitchen to bright hall', 5, 13, 'You head EAST.', 'You walk into the wall.', 'MOVE', null, 10),
+
+(20, 'WEST from bed to dark hall', -5, 2, 'You head WEST.', 'You walk into the wall.', 'MOVE', null, 9),
+(21, 'WEST from bed to bright hall', 5, 2, 'You head WEST.', 'You walk into the wall.', 'MOVE', null, 10),
+(22, 'WEST from bright hall to kitchen', 5, 10, 'You head WEST.', 'You walk into the wall.', 'MOVE', null, 13),
+(23, 'WEST', null, 9, 'You are swallowed up by darkness.', 'Error Code 23', 'DIE', null, null),
+
+(24, 'CLEAN your room', null, 1, 'You clean your room. You find your old BACKPACK and put it on.', 'What do you want to clean?', 'MOVE', null, 15),
+
+(25, 'USE SINK ', null, 3,'You turn the faucet and murky water dribbles out for a moment before you turn it back off.', 'What sink?', 'JOKE', null, null),
+(26, 'USE SINK', null, 7,'You turn the faucet and murky water dribbles out for a moment before you turn it back off.', 'What sink?', 'JOKE', null, null),
+(27, 'USE SINK', null, 8,'You turn the faucet and murky water dribbles out for a moment before you turn it back off.', 'What sink?', 'JOKE', null, null),
+(28, 'USE SINK', null, 13,'You turn the faucet and murky water dribbles out for a moment before you turn it back off.', 'What sink?', 'JOKE', null, null),
+
+(29, 'GRAB LIGHTER', null, 7, 'You pick up the LIGHTER.' , 'You don''t know how to do that.', 'GRAB', 3, 8),
+
+(30, 'OPEN CABINET', -3, 3, 'You open the CABINET and see a LIGHTER inside.', 'What cabinet?', 'MOVE', null, 7),
+(31, 'OPEN CABINET', 3, 3, 'You open the CABINET and it is empty.', 'What cabinet?', 'MOVE', null, 8),
+
+(32, 'CLOSE CABINET', null, 7, 'You close the CABINET.', 'What cabinet?', 'MOVE', null, 3),
+(33, 'CLOSE CABINET', null, 8, 'You close the CABINET.', 'What cabinet?', 'MOVE', null, 3),
+
+(34, 'OPEN BEDROOM DOOR', null, 15, 'The door swings open with a creak and then gets stuck on a lego.', 'You don''t think you can do that.', 'GRAB', 1, 2),
+(35, 'TRY TO CLOSE BEDROOM DOOR in bedroom', 1, 2,'It''s stuck on a lego... I guess you didn''t clean your room that well...', 'You can''t do that here.', 'JOKE',null, null),
+(36, 'TRY TO CLOSE BEDROOM DOOR in dark hall', 1, 9,'It''s stuck on a lego... I guess you didn''t clean your room that well...', 'You can''t do that here.', 'JOKE', null, null),
+(37, 'TRY TO CLOSE BEDROOM DOOR in bright hall', 1, 10,'It''s stuck on a lego... I guess you didn''t clean your room that well...', 'You can''t do that here.', 'JOKE', null, null),
+(38, 'TACO', null, null, 'Now you feel hungry...', 'You don''t know how TACO.', 'JOKE', null, null);
 
 CREATE TABLE "item" (
   "id" SERIAL PRIMARY KEY,
@@ -110,7 +182,7 @@ VALUES (1, 'BACKPACK','It holds stuff for you.'),
 (2, 'CANDLE', 'It smells like flowers.'),
 (3, 'LIGHTER', 'More useful than matches.'),
 (4, 'LIT CANDLE', 'It gives off a faint glow and pleasant smell.'),
-(5, 'Candle & Lighter', 'Meta-item'),
+(5, 'LANTERN LIT', 'Meta-item'),
 (6, 'Knife', 'It doesn''t look like the sharpest one in the drawer.');
 
 CREATE TABLE "location" (
@@ -135,59 +207,27 @@ VALUES (1, 'Bedroom', 'Dirty Bedroom', 'Your bedroom looks so dirty that you can
 (11, 'Bathroom', 'Bathroom Bright open', 'There is a dirty TOILET. A medicine CABINET over the sink is open and empty. You are holding a lit candle.', null),
 (12, 'Bedroom', 'Bright Bedroom', 'Your bedroom looks pretty good now, and smells nice with the candle you are holding.', null),
 
-(13, 'Kitchen', 'Win condition', 'You stand in a kitchen. There is a rusty FRIDGE in the far corner, an old STOVE and a couple of DRAWERS by the SINK.', null),
+(13, 'Kitchen', 'Win condition', 'You stand in a kitchen. There is a rusty FRIDGE in the far corner, an old STOVE and a couple of DRAWERS by the SINK.', 6),
 (14, 'Bathroom', 'Bathroom Bright closed', 'There is a dirty TOILET. A medicine CABINET over the sink is closed. You are holding a lit candle.', null),
 (15, 'Bedroom', 'Clean Bedroom closed Door', 'Your bedroom looks much cleaner now. You think you can reach your DOOR.', null);
 
 
-CREATE TABLE "path" (
-  "id" SERIAL PRIMARY KEY,
-  "path_name" VARCHAR (100),
-  "from_id" INT,
-  "to_id" INT,
-  "command_id" INT
-);
 
-INSERT INTO "path" ( "path_name", "from_id", "to_id", "command_id" )
-VALUES ('Clean up room', 1, 15, 8),
-('West from clean bedroom to dark hallway', 2 , 9, 7),
-('East from dark hallway to clean bedroom', 9, 2, 5),
-('North from dark hallway to default bathroom', 9 , 3 , 4),
-('North from dark hallway to open bathroom', 9, 7, 28),
-('North from dark hallway to open bathroom lighter taken', 9, 8, 27),
-('North from bright hallway to open bathroom', 10, 7, 26),
-('North from bright hallway to open bathroom lighter taken', 10, 8, 25),
-('South from default bathroom to dark hallway', 3, 9, 6),
-('South from bathroom to dark hallway', 7, 9, 6),
-('South from bathroom to dark hallway', 8, 9, 6),
-('South from default bathroom to bright hallway', 3, 10, 6),
-('South from bathroom to bright hallway', 7, 10, 6),
-('South from bathroom to bright hallway', 8, 10, 6),
-('Open Bedroom door', 15, 2, 15),
-('Close cabinet', 8, 3, 24),
-('Close cabinet', 7, 3, 24),
-('Open cabinet', 3, 7, 11),
-('Open cabinet, no lighter', 3, 8, 12),
-('Grab lighter', 7, 8, 10),
-('Light lantern', 9, 10, 3),
-('bright hall to kitchen', 10, 13, 7);
+ALTER TABLE "command" ADD FOREIGN KEY ("required_location_id") REFERENCES "location" ("id");
 
---ALTER TABLE "path" ADD FOREIGN KEY ("from_id") REFERENCES "location" ("id");
+ALTER TABLE "command" ADD FOREIGN KEY ("destination_id") REFERENCES "location" ("id");
 
---ALTER TABLE "path" ADD FOREIGN KEY ("to_id") REFERENCES "location" ("id");
+ALTER TABLE "synonym_list" ADD FOREIGN KEY ("command_id") REFERENCES "command" ("id");
 
---ALTER TABLE "command" ADD FOREIGN KEY ("required_location_id") REFERENCES "location" ("id");
+ALTER TABLE "items_carried" ADD FOREIGN KEY ("user_id") REFERENCES "user" ("id");
 
---ALTER TABLE "command" ADD FOREIGN KEY ("required_item_id") REFERENCES "item" ("id");
+ALTER TABLE "items_carried" ADD FOREIGN KEY ("item_id") REFERENCES "item" ("id");
 
---ALTER TABLE "synonym_list" ADD FOREIGN KEY ("command_id") REFERENCES "command" ("id");
+ALTER TABLE "user_location" ADD FOREIGN KEY ("location_id") REFERENCES "location" ("id");
 
---ALTER TABLE "items_carried" ADD FOREIGN KEY ("user_id") REFERENCES "user" ("id");
+ALTER TABLE "location" ADD FOREIGN KEY ("item_found_here_id") REFERENCES "item" ("id");
 
---ALTER TABLE "items_carried" ADD FOREIGN KEY ("item_id") REFERENCES "item" ("id");
 
---ALTER TABLE "user_location" ADD FOREIGN KEY ("location_id") REFERENCES "location" ("id");
+COMMENT ON TABLE "location" IS 'map nodes';
 
---COMMENT ON TABLE "location" IS 'map nodes';
-
---COMMENT ON TABLE "path" IS 'map edges';
+COMMENT ON TABLE "command" IS 'map edges';

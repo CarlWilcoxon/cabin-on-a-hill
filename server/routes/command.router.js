@@ -17,31 +17,35 @@ router.post('/:search', rejectUnauthenticated, async (req, res) => {
     await connection.query('BEGIN');
 
     // Figure out if the word is in the synonym list
-    const synQuery = `SELECT * FROM synonym_list
-                      JOIN "command" ON "command"."id" = "synonym_list"."command_id"
-                      WHERE synonym_list.synonym = $1;`
+    const synQuery =
+      `SELECT * FROM synonym_list
+        JOIN "command" ON "command"."id" = "synonym_list"."command_id"
+        WHERE synonym_list.synonym = $1;`
     const synValues = [ req.params.search ];
 
     // Save the result so we can get the returned value
     const result = await connection.query( synQuery, synValues );
 
     // Load the user's inventory
-    const invQuery = `SELECT * FROM "items_carried"
-                      WHERE user_id = $1;`
+    const invQuery =
+      `SELECT * FROM "items_carried"
+        WHERE user_id = $1;`
     const invValues = [ req.user.id ];
 
     // Save the result so we can get the returned value
-    const inventory = await connection.query( invQuery, invValues );
+    const tempInv = await connection.query( invQuery, invValues );
+    const inventory = tempInv.rows.map(row => row.item_id);
 
     // Load the user's current location
-    const locationQuery = `SELECT * FROM "location"
-                          JOIN "user_location" ON user_location.location_id = location.id
-                          WHERE user_id= $1`;
+    const locationQuery =
+      `SELECT * FROM "location"
+        JOIN "user_location" ON user_location.location_id = location.id
+        WHERE user_id= $1`;
     // save the result so we can use it later
     const currentLocation = (await connection.query(locationQuery, [req.user.id]));
 
     console.log('current location:', currentLocation.rows[0]);
-    console.log('current inventory:', inventory.rows);
+    console.log('current inventory:', inventory);
     console.log('commands to try:', result.rows);
     // check each entry from the synonym list that was returned
     for (let i = 0; i < result.rows.length; i++) {
@@ -49,34 +53,33 @@ router.post('/:search', rejectUnauthenticated, async (req, res) => {
         ...result.rows[i],
         successful: false,  //add a variable to see if a command is used correctly
       };
+      // const {required_location_id} = result.rows[i];
+
       switch (result.rows[i].server_keyword) {
 
       //  grab handler
         case 'GRAB':
           // make sure the user is in the correct location or there is no location restriction
-          // same check for items
+          // same check for items, but if the required item_id is negative, it makes sure that the
+          // user does NOT carry the item
           if ((currentLocation.rows[0].location_id === result.rows[i].required_location_id
             || result.rows[i].required_location_id === null) &&
-            (inventory.rows.includes(result.rows[i].required_item_id)
-              || result.rows[i].required_item_id === null)) {
+            (inventory.includes(result.rows[i].required_item_id)
+            || result.rows[i].required_item_id === null
+            || (result.rows[i].required_item_id < 0
+              && !(inventory.includes(-1 * result.rows[i].required_item_id)) ))) {
             // if they are then add the correct item to the items_carried table
             const grabQuery = `INSERT INTO "items_carried" ("user_id", "item_id")
                               VALUES ( $1 , $2 );`
             const grabValues = [ req.user.id, result.rows[i].grab_item_id ];
             await connection.query( grabQuery, grabValues );
 
-            // make sure the user is in the correct location
-            //if they are then look for the path that matches the command_id
-            const pathQuery = `SELECT * FROM "path"
-                              WHERE "command_id" = $1;`
-            const pathValue = [ result.rows[i].id ];
-            const path = await connection.query( pathQuery , pathValue );
-
-            // move the user along the path
-            const moveQuery = `UPDATE "user_location"
-                              SET "location_id" = $1
-                              WHERE "user_id" = $2;`
-            const moveValue = [ path.rows[0].to_id , req.user.id ];
+            // move the user to the destination
+            const moveQuery =
+              `UPDATE "user_location"
+                SET "location_id" = $1
+                WHERE "user_id" = $2;`
+            const moveValue = [ result.rows[i].destination_id , req.user.id ];
             await connection.query( moveQuery, moveValue );
 
             // Update the variables to indicate what was done and tell the client
@@ -89,22 +92,25 @@ router.post('/:search', rejectUnauthenticated, async (req, res) => {
             break;
       //  move handler
         case 'MOVE':
+          console.log('logic test:', ( //this broken
+            (inventory.includes(result.rows[i].required_item_id)
+            // || (result.rows[i].required_item_id < 0
+            //   && !(inventory.includes(-1 * result.rows[i].required_item_id)) )
+            )));
           // make sure the user is in the correct location and has any needed items
           if ((currentLocation.rows[0].location_id === result.rows[i].required_location_id
             || result.rows[i].required_location_id === null) &&
-            (inventory.rows.includes(result.rows[i].required_item_id)
-              || result.rows[i].required_item_id === null)) {
-            //if they are then look for the path that matches the command_id
-            const pathQuery = `SELECT * FROM "path"
-                              WHERE "command_id" = $1;`
-            const pathValue = [ result.rows[i].id ];
-            const path = await connection.query( pathQuery , pathValue );
+            (inventory.includes(result.rows[i].required_item_id)
+            || result.rows[i].required_item_id === null
+            || (result.rows[i].required_item_id < 0
+              && !(inventory.includes(-1 * result.rows[i].required_item_id)) ))) {
 
-            // move the user along the path
-            const moveQuery = `UPDATE "user_location"
-                              SET "location_id" = $1
-                              WHERE "user_id" = $2;`
-            const moveValue = [ path.rows[0].to_id , req.user.id ];
+            // move the user to the destination
+            const moveQuery =
+              `UPDATE "user_location"
+                SET "location_id" = $1
+                WHERE "user_id" = $2;`
+            const moveValue = [ result.rows[i].destination_id , req.user.id ];
             await connection.query( moveQuery, moveValue );
 
             result.rows[i] = {
@@ -118,7 +124,7 @@ router.post('/:search', rejectUnauthenticated, async (req, res) => {
           // make sure the user is in the correct location and has any needed items
           if ((currentLocation.rows[0].location_id === result.rows[i].required_location_id
             || result.rows[i].required_location_id === null) &&
-            (inventory.rows.includes(result.rows[i].required_item_id)
+            (inventory.includes(result.rows[i].required_item_id)
               || result.rows[i].required_item_id === null)) {
 
             // delete items the user acquired
@@ -143,8 +149,10 @@ router.post('/:search', rejectUnauthenticated, async (req, res) => {
           break;
         case 'JOKE':
         // make sure the user is in the correct location and has any needed items
-          if ((currentLocation.rows[0].location_id === result.rows[i].required_location_id || result.rows[i].required_location_id === null)
-            && (inventory.rows.includes(result.rows[i].required_item_id) || result.rows[i].required_item_id === null)) {
+          if ((currentLocation.rows[0].location_id === result.rows[i].required_location_id
+             || result.rows[i].required_location_id === null) &&
+             (inventory.includes(result.rows[i].required_item_id)
+             || result.rows[i].required_item_id === null)) {
             // mark that the action was successful
               result.rows[i] = {
               ...result.rows[i],
