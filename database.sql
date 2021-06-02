@@ -27,6 +27,9 @@ VALUES
 ('USE BLINDS', 2),
 ('USE BLINDS', 3),
 ('USE BLINDS', 4),
+('CLOSE BLINDS', 2),
+('CLOSE BLINDS', 3),
+('CLOSE BLINDS', 4),
 ('LIGHT LANTERN', 5),
 ('DIE', 6),
 
@@ -165,9 +168,9 @@ VALUES (1, 'LOOK', null, null, 'Error Code 1', 'You don''t see that.', 'LOOK', n
 (33, 'CLOSE CABINET', null, 8, 'You close the CABINET.', 'What cabinet?', 'MOVE', null, 3),
 
 (34, 'OPEN BEDROOM DOOR', null, 15, 'The door swings open with a creak and then gets stuck on a lego.', 'You don''t think you can do that.', 'GRAB', 1, 2),
-(35, 'TRY TO CLOSE BEDROOM DOOR in bedroom', 1, 2,'It''s stuck on a lego... I guess you didn''t clean your room that well...', 'You can''t do that here.', 'JOKE',null, null),
-(36, 'TRY TO CLOSE BEDROOM DOOR in dark hall', 1, 9,'It''s stuck on a lego... I guess you didn''t clean your room that well...', 'You can''t do that here.', 'JOKE', null, null),
-(37, 'TRY TO CLOSE BEDROOM DOOR in bright hall', 1, 10,'It''s stuck on a lego... I guess you didn''t clean your room that well...', 'You can''t do that here.', 'JOKE', null, null),
+(35, 'TRY TO CLOSE STUCK DOOR in bedroom', 1, 2,'It''s stuck on a lego... I guess you didn''t clean your room that well...', 'You can''t do that here.', 'JOKE',null, null),
+(36, 'TRY TO CLOSE STUCK DOOR in dark hall', 1, 9,'It''s stuck on a lego... I guess you didn''t clean your room that well...', 'You can''t do that here.', 'JOKE', null, null),
+(37, 'TRY TO CLOSE STUCK DOOR in bright hall', 1, 10,'It''s stuck on a lego... I guess you didn''t clean your room that well...', 'You can''t do that here.', 'JOKE', null, null),
 (38, 'TACO', null, null, 'Now you feel hungry...', 'You don''t know how TACO.', 'JOKE', null, null);
 
 CREATE TABLE "item" (
