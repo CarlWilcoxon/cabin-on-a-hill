@@ -7,7 +7,7 @@ _Duration: 2 Week Sprint + 1 Day bugfix_
 
 I have not seen a text adventure in years a wanted to try my hand at it. I created it for my Solo Project at Prime Digital Academy.
 
-To see the fully functional site, please visit: [DEPLOYED VERSION OF APP](https://cabin-on-a-hill.herokuapp.com/)
+To see the fully functional site, please visit: [https://cabin-on-a-hill.herokuapp.com/](https://cabin-on-a-hill.herokuapp.com/)
 
 ## Screen Shot
 
